@@ -12,7 +12,6 @@ services:
     build: .
     volumes:
       - ./src:/app/src:Z
-      - ./public:/app/public:Z
     environment:
       - CORS_WHITELIST=http://localhost:5000,http://localhost:3000
       - MONGODB_ENDPOINT=mongo:27017
