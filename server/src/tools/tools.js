@@ -17,6 +17,8 @@ function validate(schema) {
   return function(req, res, next) {
     const { value, error } = Joi.validate(req.body, schema);
 
+    res.body = value;
+
     if (error) return res.status(400).end();
     return next();
   }

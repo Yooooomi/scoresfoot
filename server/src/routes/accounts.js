@@ -15,9 +15,10 @@ module.exports = function (passport) {
     async (username, password, done) => {
       let user = null;
       try {
-        user = await db.getUser('username', username);
+        user = await db.getFullUser('username', username);
       }
       catch (e) {
+        console.error(e);
         return done(null, false, { message: 'Incorrect username.' });
       }
       if (bcrypt.compareSync(password, user.password)) {
@@ -33,7 +34,7 @@ module.exports = function (passport) {
   });
 
   passport.deserializeUser(function (id, done) {
-    db.getUser('_id', id)
+    db.getFullUser('_id', id)
       .then(u => done(null, u))
       .catch(e => done(null, null));
   });
@@ -77,7 +78,6 @@ module.exports = function (passport) {
   });
 
   routes.get('/me', (req, res) => {
-    console.log(req.user);
     return res.status(200).send(req.user);
   });
 

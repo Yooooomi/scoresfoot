@@ -33,15 +33,28 @@ const TeamSchema = new mongoose.Schema({
   logo: String,
 });
 
-const User = mongoose.model('user', UserSchema);
-const Prono = mongoose.model('prono', PronoSchema);
-const Match = mongoose.model('match', MatchSchema);
-const Team = mongoose.model('team', TeamSchema);
+const User = mongoose.model('User', UserSchema);
+const Prono = mongoose.model('Prono', PronoSchema);
+const Match = mongoose.model('Match', MatchSchema);
+const Team = mongoose.model('Team', TeamSchema);
 
-function getUser(field, value) {
-  return User.findOne({
+async function getUser(field, value) {
+  const user = await User.findOne({
     [field]: value,
   });
+  return user;
+}
+
+async function getFullUser(field, value) {
+  let userFound = await User.findOne({
+    [field]: value,
+  }).populate('pronos').lean();
+  const todoMatches = await Match.find({
+    _id: { $nin: userFound.pronos.map(e => e._id) },
+    date: { $gt: (new Date()).toISOString() },
+  }).sort('date').populate('guest').populate('local');
+  userFound.todos = todoMatches;
+  return userFound;
 }
 
 function getMatch(field, value) {
@@ -135,6 +148,7 @@ function getTeams() {
 
 module.exports = {
   getUser,
+  getFullUser,
   registerUser,
   getMatch,
   writeProno,

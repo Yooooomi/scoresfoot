@@ -10,7 +10,7 @@ module.exports = function () {
     logo: Joi.string().default('yaya.com'),
   });
 
-  routes.post('teams/new', validate(newTeamSchema), isLogged, isAdmin, async (req, res) => {
+  routes.post('/teams/new', validate(newTeamSchema), isLogged, isAdmin, async (req, res) => {
     const { name, logo } = req.body;
 
     try {
@@ -22,7 +22,7 @@ module.exports = function () {
     }
   });
 
-  routes.get('teams', async (req, res) => {
+  routes.get('/teams', async (req, res) => {
     try {
       const teams = await db.getTeams();
       return res.status(200).send(teams);

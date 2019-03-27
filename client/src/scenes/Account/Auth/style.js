@@ -7,7 +7,7 @@ export default theme => ({
     padding: '50px',
     width: '30%',
     margin: 'auto',
-    background: theme.palette.secondary.main,
+    background: theme.palette.primary.main,
   },
   input: {
     display: 'block',

@@ -1,11 +1,11 @@
 export default theme => ({
   root: {
-    color: 'white',
-    background: 'white',
+    color: 'black',
+    background: '#F2F2F2',
   },
   header: {
     height: theme.sizes.header.height,
-    background: theme.palette.secondary.main,
+    background: 'white',
     lineHeight: theme.sizes.header.height,
   },
   container: {
@@ -21,7 +21,7 @@ export default theme => ({
   content: {
     display: 'flex',
     flex: 10,
-    padding: '25px',
+    padding: '100px',
     width: '100%',
     position: 'relative',
   },

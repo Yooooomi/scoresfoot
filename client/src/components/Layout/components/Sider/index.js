@@ -2,9 +2,10 @@ import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import style from './style';
 import { Link } from 'react-router-dom';
-import { List, ListItem } from '@material-ui/core';
+import { List, ListItem, Paper } from '@material-ui/core';
 import { connect } from 'react-redux';
 import { mapStateToProps, mapDispatchToProps } from '../../../../services/redux/tools';
+import urls from '../../../../services/urls';
 
 const LogState = {
   WHATEVER: 0,
@@ -13,7 +14,7 @@ const LogState = {
 };
 
 const modules = [
-  { name: 'My account', link: '/me', log: LogState.NEEDLOG },
+  { name: 'My account', link: urls.home, log: LogState.NEEDLOG },
   { name: 'Pronostic', link: '/prono', log: LogState.NEEDLOG },
   { name: 'My pronos', link: '/my_pronos', log: LogState.NEEDLOG },
   { name: 'Add match', link: '/add_match', log: LogState.NEEDLOG, admin: true },
@@ -23,7 +24,7 @@ class Sider extends React.Component {
   render() {
     const { classes } = this.props;
     return (
-      <div className={classes.root}>
+      <Paper square className={classes.root}>
         <List>
           {
             modules.map((e, k) => {
@@ -45,7 +46,7 @@ class Sider extends React.Component {
             })
           }
         </List>
-      </div>
+      </Paper>
     );
   }
 }

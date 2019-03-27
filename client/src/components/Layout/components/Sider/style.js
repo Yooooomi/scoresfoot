@@ -1,6 +1,8 @@
 export default theme => ({
   root: {
+    padding: '50px 25px',
     position: 'relative',
+    background: theme.palette.primary.main,
     width: '100%',
   },
   container: {
