@@ -11,8 +11,10 @@ services:
   server:
     build: .
     volumes:
-      - ./:/app:Z
+      - ./src:/app/src:Z
+      - ./public:/app/public:Z
     environment:
+      - CORS_WHITELIST=http://localhost:5000,http://localhost:3000
       - MONGODB_ENDPOINT=mongo:27017
       - MONGODB_USERNAME=root
       - MONGODB_PASSWORD=password

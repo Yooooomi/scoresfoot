@@ -7,7 +7,8 @@ const app = express();
 const cookies = require('cookie-session');
 
 const allowedCORS = [
-  'yooooomi.com',
+  'scoresfoot.yooooomi.com',
+  'https://scoresfoot.yooooomi.com',
   'http://localhost:3000',
 ];
 
