@@ -69,36 +69,46 @@ class UpdateMatch extends React.Component {
     const { classes } = this.props;
     const { matches } = this.state;
 
-    console.log(matches);
-
     return (
       <div className={classes.root}>
         <Title>Mettre a jour un score</Title>
         {
-          matches.map((e, k) => (
-            <Grid container key={e._id} alignItems={'center'}>
-              <Grid item xs={3}>
-                <InlineTeam team={e.local} />
+          matches.length === 0 ? (
+            <NoMatch />
+          ) : (
+            matches.map((e, k) => (
+              <Grid container key={e._id} alignItems={'center'}>
+                <Grid item xs={3}>
+                  <InlineTeam team={e.local} />
+                </Grid>
+                <Grid item xs={1}>
+                  <Numbers value={this.state.local[k]} name={'local'} onValueChange={(name, value) => this.update(k, name, value)} />
+                </Grid>
+                <Grid item xs={1}>à</Grid>
+                <Grid item xs={1}>
+                  <Numbers value={this.state.guest[k]} name={'guest'} onValueChange={(name, value) => this.update(k, name, value)} />
+                </Grid>
+                <Grid item xs={3}>
+                  <InlineTeam right team={e.guest} />
+                </Grid>
+                <Grid item xs={3} style={{ textAlign: 'right' }}>
+                  <Button variant={'contained'} color={'primary'} onClick={e => this.setScore(k)}>OK</Button>
+                </Grid>
               </Grid>
-              <Grid item xs={1}>
-                <Numbers value={this.state.local[k]} name={'local'} onValueChange={(name, value) => this.update(k, name, value)} />
-              </Grid>
-              <Grid item xs={1}>à</Grid>
-              <Grid item xs={1}>
-                <Numbers value={this.state.guest[k]} name={'guest'} onValueChange={(name, value) => this.update(k, name, value)} />
-              </Grid>
-              <Grid item xs={3}>
-                <InlineTeam right team={e.guest} />
-              </Grid>
-              <Grid item xs={3} style={{ textAlign: 'right' }}>
-                <Button variant={'contained'} color={'primary'} onClick={e => this.setScore(k)}>OK</Button>
-              </Grid>
-            </Grid>
-          ))
+            ))
+          )
         }
       </div>
     );
   }
+}
+
+const NoMatch = props => {
+  return (
+    <div>
+      Pas de matchs a mettre a jour
+    </div>
+  );
 }
 
 export default withStyles(style)(UpdateMatch);

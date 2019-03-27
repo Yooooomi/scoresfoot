@@ -16,6 +16,7 @@ import AddMatch from './scenes/Admin/AddMatch';
 import Prono from './scenes/Prono';
 import UpdateMatch from './scenes/Admin/UpdateMatch';
 import Pronos from './scenes/Pronos';
+import Popup from './components/Popup';
 
 class App extends Component {
   async componentDidMount() {
@@ -36,6 +37,7 @@ class App extends Component {
           <div className="App">
             <Notification />
             <Layout>
+              <Popup />
               <Switch>
                 <Route exact path={urls.account.login} component={Auth} />
                 <Route exact path={urls.account.register} component={Auth} />

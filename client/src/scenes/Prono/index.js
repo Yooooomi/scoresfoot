@@ -73,7 +73,7 @@ class Prono extends React.Component {
 
     if (!this.pronoAvailable()) {
       clearInterval(this.int);
-      return null;
+      return <NoProno />;
     }
     const { local, guest, cote } = this.props.user.todos[0];
 
@@ -110,5 +110,14 @@ class Prono extends React.Component {
     );
   }
 }
+
+const NoProno = props => {
+  return (
+    <div>
+      <Title>Pronostiquer un match</Title>
+      <div>Aucun match a pronostiquer !</div>
+    </div>
+  );
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(style)(Prono));

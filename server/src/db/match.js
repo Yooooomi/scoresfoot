@@ -22,6 +22,17 @@ const PronoSchema = new mongoose.Schema({
   coeff: Number,
 });
 
+const StepSchema = new mongoose.Schema({
+  matchs: [{type: mongoose.Schema.Types.ObjectId, ref: 'Match', default: []}],
+  name: String,
+});
+
+const CompetitionSchema = new mongoose.Schema({
+  steps: [{type: mongoose.Schema.Types.ObjectId, ref: 'Step', default: []}],
+  start: { type: mongoose.Schema.Types.Date },
+  name: String,
+});
+
 const MatchSchema = new mongoose.Schema({
   local: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
   guest: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
@@ -41,6 +52,8 @@ const User = mongoose.model('User', UserSchema);
 const Prono = mongoose.model('Prono', PronoSchema);
 const Match = mongoose.model('Match', MatchSchema);
 const Team = mongoose.model('Team', TeamSchema);
+const Competition = mongoose.model('Competition', CompetitionSchema);
+const Step = mongoose.model('Step', StepSchema);
 
 async function getUser(field, value) {
   const user = await User.findOne({
@@ -93,6 +106,25 @@ function registerUser(name, password) {
   return user.save();
 }
 
+function newCompetition(name, start) {
+  return (new Competition({
+    name,
+    start,
+  }).save())
+}
+
+async function newStep(competition, name) {
+  let step = new Step({
+    name,
+  }).save();
+  step = await step;
+  return Competition.findByIdAndUpdate(competition, {
+    $push: {
+      steps: step._id
+    }
+  });
+}
+
 async function writeProno(userId, matchId, local, guest, coeff) {
 
   // TODO: more efficient way
@@ -143,7 +175,22 @@ async function modifyProno(userId, matchId, local, guest, coeff) {
   });
 }
 
-async function addMatch(localId, guestId, date) {
+function getCompetitions() {
+  return Competition.find({});
+}
+
+function getCompetition(competition) {
+  return Competition.findById(competition).populate({
+    path: 'steps',
+    model: 'Step',
+    populate: {
+      path: 'matchs',
+      model: 'Match',
+    }
+  });
+}
+
+async function addMatch(step, localId, guestId, date) {
   const match = await new Match({
     local: localId,
     guest: guestId,
@@ -156,9 +203,15 @@ async function addMatch(localId, guestId, date) {
   const g = Team.findByIdAndUpdate(guestId, {
     $push: { history: match._id },
   });
+  const s = Step.findByIdAndUpdate(step, {
+    $push: {
+      matchs: match._id,
+    },
+  });
 
   await l;
   await g;
+  await s;
   return match;
 }
 
@@ -198,4 +251,8 @@ module.exports = {
   getMatchesEndedWithoutScores,
   addTeam,
   getTeams,
+  newCompetition,
+  newStep,
+  getCompetitions,
+  getCompetition,
 };

@@ -4,17 +4,73 @@ const Joi = require('joi');
 const db = require('../db/match');
 
 module.exports = function () {
+
+  const newCompetitionSchema = Joi.object().keys({
+    name: Joi.string().min(1).required(),
+    start: Joi.any().required(),
+  });
+
+  routes.post('/competition/new', validate(newCompetitionSchema), isLogged, isAdmin, async (req, res) => {
+    const { name, start } = req.body;
+
+    try {
+      const newcomp = await db.newCompetition(name, start);
+      return res.status(200).send(newcomp);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
+  routes.get('/competition/getall', isLogged, async (req, res) => {
+    try {
+      const comps = await db.getCompetitions();
+      return res.status(200).send(comps);
+    } catch (e) {
+      return res.status(500).end();
+    }
+  });
+
+  routes.get('/competition/:id', isLogged, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const comp = await db.getCompetition(id);
+      return res.status(200).send(comp);
+    } catch (e) {
+      return res.status(500).end();
+    }
+  });
+
+  const newStepSchema = Joi.object().keys({
+    competitionId: Joi.string().required(),
+    name: Joi.string().required(),
+  });
+
+  routes.post('/competition/newstep', validate(newStepSchema), isLogged, isAdmin, async (req, res) => {
+    const { competitionId, name } = req.body;
+
+    try {
+      await db.newStep(competitionId, name);
+      return res.status(200).end();
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
   const newMatchSchema = Joi.object().keys({
+    stepId: Joi.string().required(),
     local: Joi.string().required(),
     guest: Joi.string().required(),
     date: Joi.any().required(),
   });
 
   routes.post('/match/new', validate(newMatchSchema), isLogged, isAdmin, async (req, res) => {
-    const { local, guest, date } = req.body;
+    const { local, guest, date, stepId } = req.body;
 
     try {
-      await db.addMatch(local, guest, date);
+      await db.addMatch(stepId, local, guest, date);
       return res.status(200).end();
     } catch (e) {
       return res.status(500).end();
