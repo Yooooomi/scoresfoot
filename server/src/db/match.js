@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { pointsEarned } = require('../tools/rawTools');
 
 mongoose.connect(`mongodb://mongo:27017/scoresfoot?authSource=admin`, {
   useNewUrlParser: true,
@@ -24,6 +25,8 @@ const PronoSchema = new mongoose.Schema({
 const MatchSchema = new mongoose.Schema({
   local: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
   guest: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+  localScore: { type: Number, default: -1 },
+  guestScore: { type: Number, default: -1 },
   date: { type: mongoose.Schema.Types.Date },
   cote: { type: mongoose.Schema.Types.Number, default: 1 },
 });
@@ -31,6 +34,7 @@ const MatchSchema = new mongoose.Schema({
 const TeamSchema = new mongoose.Schema({
   name: String,
   logo: String,
+  history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Match', default: [] }],
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -46,14 +50,30 @@ async function getUser(field, value) {
 }
 
 async function getFullUser(field, value) {
-  let userFound = await User.findOne({
+  const userFound = await User.findOne({
     [field]: value,
-  }).populate('pronos').lean();
+  }).populate({
+    path: 'pronos',
+    populate: {
+      path: 'match',
+      model: 'Match',
+      populate: {
+        path: 'local guest',
+        model: 'Team'
+      }
+    }
+  }).lean();
+
+  let points = userFound.pronos.filter(e => e.match.localScore !== -1).reduce((acc, curr) => {
+    return acc + pointsEarned(curr);
+  }, 0);
+
   const todoMatches = await Match.find({
-    _id: { $nin: userFound.pronos.map(e => e._id) },
+    _id: { $nin: userFound.pronos.map(e => e.match) },
     date: { $gt: (new Date()).toISOString() },
-  }).sort('date').populate('guest').populate('local');
+  }).sort('date').populate('local').populate('guest');
   userFound.todos = todoMatches;
+  userFound.points = points;
   return userFound;
 }
 
@@ -80,8 +100,8 @@ async function writeProno(userId, matchId, local, guest, coeff) {
     _id: userId,
   }).populate('pronos');
 
-  if (existing.pronos.some(e => e.match === matchId)) {
-    throw new Error({
+  if (existing.pronos.some(e => e.match.toString() === matchId)) {
+    throw ({
       code: 'ALREADY_PRONOD',
       message: 'Already pronostic\'d'
     });
@@ -123,14 +143,34 @@ async function modifyProno(userId, matchId, local, guest, coeff) {
   });
 }
 
-function addMatch(localId, guestId, date) {
-  const match = new Match({
+async function addMatch(localId, guestId, date) {
+  const match = await new Match({
     local: localId,
     guest: guestId,
     date,
+  }).save();
+
+  const l = Team.findByIdAndUpdate(localId, {
+    $push: { history: match._id },
+  });
+  const g = Team.findByIdAndUpdate(guestId, {
+    $push: { history: match._id },
   });
 
-  return match.save();
+  await l;
+  await g;
+  return match;
+}
+
+function getMatchesEndedWithoutScores() {
+  return Match.find({ localScore: -1, date: { $lt: new Date() } }).populate('local guest');
+}
+
+async function setMatchScore(matchId, local, guest) {
+  await Match.findByIdAndUpdate(matchId, {
+    localScore: local,
+    guestScore: guest,
+  });
 }
 
 function addTeam(name, logo) {
@@ -143,7 +183,7 @@ function addTeam(name, logo) {
 }
 
 function getTeams() {
-  return Team.find({});
+  return Team.find({}).populate('history');
 }
 
 module.exports = {
@@ -154,6 +194,8 @@ module.exports = {
   writeProno,
   modifyProno,
   addMatch,
+  setMatchScore,
+  getMatchesEndedWithoutScores,
   addTeam,
   getTeams,
 };

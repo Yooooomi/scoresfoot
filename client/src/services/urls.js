@@ -5,4 +5,7 @@ export default ({
     register: '/register',
   },
   addMatch: '/add_match',
+  updateMatch: '/update',
+  prono: '/prono',
+  myPronos: '/my_pronos',
 });

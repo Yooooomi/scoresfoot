@@ -5,10 +5,12 @@ import { connect } from 'react-redux';
 import { mapStateToProps } from '../../services/redux/tools';
 
 const PrivateRoute = props => {
-  if (!props.user) {
+  if (!props.user && props.ready) {
     return <Redirect to={urls.account.login} />;
-  } else {
+  } else if (props.user && props.ready) {
     return <Route {...props} />;
+  } else {
+    return null;
   }
 };
 

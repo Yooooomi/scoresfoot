@@ -19,6 +19,7 @@ module.exports = function () {
       await db.writeProno(req.user._id, matchId, local, guest, coeff);
       return res.status(200).end();
     } catch (e) {
+      console.error(e);
       if (e.code === 'ALREADY_PRONOD') {
         return res.status(400).end();
       }

@@ -13,6 +13,9 @@ import { connect } from 'react-redux';
 import { mapStateToProps, mapDispatchToProps } from './services/redux/tools';
 import api from './services/api';
 import AddMatch from './scenes/Admin/AddMatch';
+import Prono from './scenes/Prono';
+import UpdateMatch from './scenes/Admin/UpdateMatch';
+import Pronos from './scenes/Pronos';
 
 class App extends Component {
   async componentDidMount() {
@@ -21,8 +24,9 @@ class App extends Component {
       console.log('DATA', user.data);
       this.props.updateUser(user.data);
     } catch (e) {
-      // Nothing happens, user justnot logged
+      // Nothing happens, user just not logged
     }
+    this.props.updateReady(true);
   }
 
   render() {
@@ -35,8 +39,11 @@ class App extends Component {
               <Switch>
                 <Route exact path={urls.account.login} component={Auth} />
                 <Route exact path={urls.account.register} component={Auth} />
+                <PrivateRoute exact path={urls.prono} component={Prono} />
                 <PrivateRoute exact path={urls.home} component={Me} />
                 <PrivateRoute exact path={urls.addMatch} component={AddMatch} />
+                <PrivateRoute exact path={urls.updateMatch} component={UpdateMatch} />
+                <PrivateRoute exact path={urls.myPronos} component={Pronos} />
                 <PrivateRoute exact path={'*'} />
               </Switch>
             </Layout>

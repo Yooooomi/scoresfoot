@@ -16,8 +16,9 @@ const LogState = {
 const modules = [
   { name: 'My account', link: urls.home, log: LogState.NEEDLOG },
   { name: 'Pronostic', link: '/prono', log: LogState.NEEDLOG },
-  { name: 'My pronos', link: '/my_pronos', log: LogState.NEEDLOG },
+  { name: 'My pronos', link: urls.myPronos, log: LogState.NEEDLOG },
   { name: 'Add match', link: '/add_match', log: LogState.NEEDLOG, admin: true },
+  { name: 'Update match', link: urls.updateMatch, log: LogState.NEEDLOG, admin: true },
 ];
 
 class Sider extends React.Component {

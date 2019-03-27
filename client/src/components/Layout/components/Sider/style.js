@@ -1,6 +1,6 @@
 export default theme => ({
   root: {
-    padding: '50px 25px',
+    padding: '50px 0',
     position: 'relative',
     background: theme.palette.primary.main,
     width: '100%',
@@ -8,12 +8,14 @@ export default theme => ({
   container: {
     position: 'relative',
     width: '100%',
+    transition: 'all 250ms',
     '&:hover': {
-      background: 'lightgrey',
+    transition: 'all 250ms',
+    background: 'rgba(0.1, 0.1, 0.1, 0.1)',
     }
   },
   link: {
     width: '100%',
     color: 'white',
-  }
+  },
 });
