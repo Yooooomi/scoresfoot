@@ -2,10 +2,11 @@ import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import style from './style';
 import { Link } from 'react-router-dom';
-import { List, ListItem, Paper } from '@material-ui/core';
+import { List, ListItem, Paper, Input } from '@material-ui/core';
 import { connect } from 'react-redux';
 import { mapStateToProps, mapDispatchToProps } from '../../../../services/redux/tools';
 import urls from '../../../../services/urls';
+import SearchBar from './components/SearchBar';
 
 const LogState = {
   WHATEVER: 0,
@@ -19,6 +20,7 @@ const modules = [
   { name: 'My pronos', link: urls.myPronos, log: LogState.NEEDLOG },
   { name: 'Add match', link: '/add_match', log: LogState.NEEDLOG, admin: true },
   { name: 'Update match', link: urls.updateMatch, log: LogState.NEEDLOG, admin: true },
+  { name: 'Modify match', link: urls.modifyMatches, log: LogState.NEEDLOG, admin: true },
 ];
 
 class Sider extends React.Component {
@@ -26,6 +28,7 @@ class Sider extends React.Component {
     const { classes } = this.props;
     return (
       <Paper square className={classes.root}>
+        <SearchBar className={classes.search} />
         <List>
           {
             modules.map((e, k) => {

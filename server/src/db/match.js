@@ -2,11 +2,16 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { pointsEarned } = require('../tools/rawTools');
 
-mongoose.connect(`mongodb://mongo:27017/scoresfoot?authSource=admin`, {
+mongoose.connect(`mongodb://localhost:27017/scoresfoot?authSource=admin`, {
   useNewUrlParser: true,
   user: process.env.MONGODB_USERNAME,
   pass: process.env.MONGODB_PASSWORD
 });
+// mongoose.connect(`mongodb://mongo:27017/scoresfoot?authSource=admin`, {
+//   useNewUrlParser: true,
+//   user: process.env.MONGODB_USERNAME,
+//   pass: process.env.MONGODB_PASSWORD
+// });
 
 const UserSchema = new mongoose.Schema({
   admin: { type: Boolean, default: true },
@@ -23,12 +28,12 @@ const PronoSchema = new mongoose.Schema({
 });
 
 const StepSchema = new mongoose.Schema({
-  matchs: [{type: mongoose.Schema.Types.ObjectId, ref: 'Match', default: []}],
+  matchs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Match', default: [] }],
   name: String,
 });
 
 const CompetitionSchema = new mongoose.Schema({
-  steps: [{type: mongoose.Schema.Types.ObjectId, ref: 'Step', default: []}],
+  steps: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Step', default: [] }],
   start: { type: mongoose.Schema.Types.Date },
   name: String,
 });
@@ -67,6 +72,7 @@ async function getFullUser(field, value) {
     [field]: value,
   }).populate({
     path: 'pronos',
+    model: 'Prono',
     populate: {
       path: 'match',
       model: 'Match',
@@ -84,9 +90,10 @@ async function getFullUser(field, value) {
   const todoMatches = await Match.find({
     _id: { $nin: userFound.pronos.map(e => e.match) },
     date: { $gt: (new Date()).toISOString() },
-  }).sort('date').populate('local').populate('guest');
+  }).sort('date').populate('local guest');
   userFound.todos = todoMatches;
   userFound.points = points;
+  console.log('THE USER', userFound);
   return userFound;
 }
 
@@ -94,6 +101,35 @@ function getMatch(field, value) {
   return Match.findOne({
     [field]: value,
   });
+}
+
+async function addMatchNames(date, stepName, team1Name, team2Name, score1 = -1, score2 = -1) {
+  const teams = await Team.find({
+    name: { $in: [team1Name, team2Name] }
+  });
+
+
+  const team1 = teams.find(e => e.name === team1Name);
+  const team2 = teams.find(e => e.name === team2Name);
+
+  let match = new Match({
+    local: team1._id,
+    guest: team2._id,
+    localScore: score1,
+    guestScore: score2,
+    date
+  });
+
+  const l = Team.findByIdAndUpdate(team1._id, { $push: { history: match._id } });
+  const g = Team.findByIdAndUpdate(team2._id, { $push: { history: match._id } });
+
+  await Step.findOneAndUpdate({ name: stepName }, {
+    $push: { matchs: match._id },
+  });
+  await l;
+  await g;
+  match = await match.save();
+  return match;
 }
 
 function registerUser(name, password) {
@@ -118,11 +154,32 @@ async function newStep(competition, name) {
     name,
   }).save();
   step = await step;
-  return Competition.findByIdAndUpdate(competition, {
+  await Competition.findByIdAndUpdate(competition, {
     $push: {
       steps: step._id
     }
   });
+  return step;
+}
+
+function getStep(stepId) {
+  return Step.findById(stepId).populate({
+    path: 'matchs',
+    populate: {
+      path: 'local guest',
+      model: 'Team',
+    }
+  });
+}
+
+function updateMatch(matchId, date) {
+  return Match.findByIdAndUpdate(matchId, {
+    date: date.toISOString(),
+  });
+}
+
+function removeMatch(matchId) {
+  return Match.findByIdAndRemove(matchId);
 }
 
 async function writeProno(userId, matchId, local, guest, coeff) {
@@ -239,6 +296,21 @@ function getTeams() {
   return Team.find({}).populate('history');
 }
 
+function getTeam(id) {
+  return Team.findById(id).populate({
+    path: 'history', populate: {
+      path: 'local guest',
+      model: 'Team',
+    }
+  });
+}
+
+function getConfrontations(team1, team2) {
+  return Match.find({
+    local: { $in: [team1, team2] },
+  }).sort('date');
+}
+
 module.exports = {
   getUser,
   getFullUser,
@@ -246,13 +318,19 @@ module.exports = {
   getMatch,
   writeProno,
   modifyProno,
+  removeMatch,
   addMatch,
   setMatchScore,
   getMatchesEndedWithoutScores,
   addTeam,
+  addMatchNames,
+  getTeam,
   getTeams,
+  updateMatch,
   newCompetition,
   newStep,
+  getStep,
   getCompetitions,
   getCompetition,
+  getConfrontations,
 };

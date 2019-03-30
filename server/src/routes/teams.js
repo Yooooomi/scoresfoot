@@ -13,9 +13,11 @@ module.exports = function () {
   routes.post('/teams/new', validate(newTeamSchema), isLogged, isAdmin, async (req, res) => {
     const { name, logo } = req.body;
 
+    console.log('Creating', name);
+
     try {
-      await db.addTeam(name, logo);
-      res.status(200).end();
+      const team = await db.addTeam(name, logo);
+      res.status(200).send(team);
     } catch (e) {
       console.error(e);
       res.status(500).end();
@@ -31,6 +33,35 @@ module.exports = function () {
       res.status(500).end();
     }
   })
+
+  routes.get('/teams/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const team = await db.getTeam(id);
+      return res.status(200).send(team);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
+  const confrontationSchema = Joi.object().keys({
+    team1: Joi.string().required(),
+    team2: Joi.string().required(),
+  });
+
+  routes.get('/teams/confrontation', validate(confrontationSchema, 'query'), async (req, res) => {
+    const { team1, team2 } = req.value;
+
+    try {
+      const confrontations = await db.getConfrontations(team1, team2);
+      return res.status(200).send(confrontations);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
 
   return routes;
 }

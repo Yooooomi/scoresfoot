@@ -8,4 +8,6 @@ export default ({
   updateMatch: '/update',
   prono: '/prono',
   myPronos: '/my_pronos',
+  modifyMatches: '/modify_matches',
+  team: '/team/:id',
 });

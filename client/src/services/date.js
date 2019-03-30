@@ -1,3 +1,18 @@
+export const months = [
+  'Janvier',
+  'Février',
+  'Mars',
+  'Avril',
+  'Mai',
+  'Juin',
+  'Juillet',
+  'Août',
+  'Septembre',
+  'Octobre',
+  'Novembre',
+  'Décembre',
+];
+
 export function timeDiff(date1, date2) {
   return (date2.getTime() - date1.getTime()) / 1000;
 }
@@ -18,6 +33,16 @@ export function timeDiffString(date1, date2) {
   diff -= value.minute * (60);
   value.second = Math.floor(diff);
   return `${value.day} jours, ${value.hour} heures, ${value.minute} minutes et ${value.second} secondes`;
+}
+
+export function describe(date) {
+  return ({
+    minutes: date.getMinutes(),
+    hours: date.getHours(),
+    day: date.getDate(),
+    month: date.getMonth(),
+    year: date.getFullYear(),
+  });
 }
 
 export default timeDiffString;

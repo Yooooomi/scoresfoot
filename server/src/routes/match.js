@@ -31,6 +31,49 @@ module.exports = function () {
     }
   });
 
+  routes.get('/competition/step/:id', isLogged, async (req, res) => {
+    try {
+      const step = await db.getStep(req.params.id);
+      return res.status(200).send(step);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
+  const modifyMatchSchema = Joi.object().keys({
+    matchId: Joi.string().required(),
+    date: Joi.any().required(),
+  });
+
+  routes.post('/match/update', validate(modifyMatchSchema), isLogged, isAdmin, async (req, res) => {
+    const { matchId, date } = req.body;
+
+    try {
+      await db.updateMatch(matchId, new Date(date));
+      return res.status(200).end();
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
+  const removeMatchSchema = Joi.object().keys({
+    matchId: Joi.string().required(),
+  });
+
+  routes.post('/match/delete', validate(removeMatchSchema), isLogged, isAdmin, async (req, res) => {
+    const { matchId } = req.body;
+
+    try {
+      await db.removeMatch(matchId);
+      return res.status(200).end();
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
   routes.get('/competition/:id', isLogged, async (req, res) => {
     const { id } = req.params;
 
@@ -51,8 +94,8 @@ module.exports = function () {
     const { competitionId, name } = req.body;
 
     try {
-      await db.newStep(competitionId, name);
-      return res.status(200).end();
+      const step = await db.newStep(competitionId, name);
+      return res.status(200).send(step);
     } catch (e) {
       console.error(e);
       return res.status(500).end();
@@ -73,6 +116,28 @@ module.exports = function () {
       await db.addMatch(stepId, local, guest, date);
       return res.status(200).end();
     } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
+  const newMatchNameSchema = Joi.object().keys({
+    stepName: Joi.string().required(),
+    local: Joi.string().required(),
+    guest: Joi.string().required(),
+    localScore: Joi.number().required(),
+    guestScore: Joi.number().required(),
+    date: Joi.any().required(),
+  });
+
+  routes.post('/match/new_by_names', validate(newMatchNameSchema), isLogged, isAdmin, async (req, res) => {
+    const { local, guest, date, stepName, localScore, guestScore } = req.body;
+
+    try {
+      await db.addMatchNames(date, stepName, local, guest, localScore, guestScore);
+      return res.status(200).end();
+    } catch (e) {
+      console.error(e);
       return res.status(500).end();
     }
   });

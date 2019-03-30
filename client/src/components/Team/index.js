@@ -2,6 +2,8 @@ import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import style from './style';
 import cl from 'classnames';
+import urls from '../../services/urls';
+import { Link } from 'react-router-dom';
 
 class Team extends React.Component {
   render() {
@@ -9,7 +11,7 @@ class Team extends React.Component {
     return (
       <div className={cl(classes.root, className)}>
         <img src={'/default_team.png'} alt={'team'} className={classes.logo} />
-        <span>{team.name}</span>
+        <Link to={urls.team.replace(':id', team._id)}><span>{team.name}</span></Link>
       </div>
     );
   }

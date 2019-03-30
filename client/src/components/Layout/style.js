@@ -23,7 +23,7 @@ export default theme => ({
   content: {
     display: 'flex',
     flex: 8,
-    padding: '50px 100px',
+    padding: '50px 50px',
     width: '100%',
     position: 'relative',
   },

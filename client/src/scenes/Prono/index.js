@@ -41,6 +41,7 @@ class Prono extends React.Component {
 
   componentDidMount() {
     console.log('mount');
+    this.updateCountdown();
     this.int = setInterval(this.updateCountdown, 1000);
   }
 
@@ -70,6 +71,8 @@ class Prono extends React.Component {
 
   render() {
     const { classes } = this.props;
+
+    console.log('USER', this.props.user);
 
     if (!this.pronoAvailable()) {
       clearInterval(this.int);
