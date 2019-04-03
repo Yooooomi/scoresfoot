@@ -18,7 +18,8 @@ import UpdateMatch from './scenes/Admin/UpdateMatch';
 import Pronos from './scenes/Pronos';
 import Popup from './components/Popup';
 import ModifyMatch from './scenes/Admin/ModifyMatch';
-import Team from './scenes/Team';
+import Team from './scenes/Teams/Team';
+import Ranking from './scenes/Teams/Ranking';
 
 class App extends Component {
   async componentDidMount() {
@@ -50,6 +51,8 @@ class App extends Component {
                 <PrivateRoute exact path={urls.myPronos} component={Pronos} />
                 <PrivateRoute exact path={urls.modifyMatches} component={ModifyMatch} />
                 <PrivateRoute exact path={urls.team} component={Team} />
+                <PrivateRoute exact path={urls.teamRanking} component={Ranking} />
+                <PrivateRoute exact path={urls.teamRanking} component={Ranking} />
                 <PrivateRoute exact path={'*'} />
               </Switch>
             </Layout>

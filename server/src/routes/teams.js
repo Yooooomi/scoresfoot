@@ -34,7 +34,7 @@ module.exports = function () {
     }
   })
 
-  routes.get('/teams/:id', async (req, res) => {
+  routes.get('/teams/team/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -57,6 +57,22 @@ module.exports = function () {
     try {
       const confrontations = await db.getConfrontations(team1, team2);
       return res.status(200).send(confrontations);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
+  routes.get('/teams/ranking', async (req, res) => {
+    let lastCompId = req.query.compId;
+
+    console.log(lastCompId);
+
+    try {
+      if (!lastCompId)
+        lastCompId = (await db.getLastCompetition())._id;
+      const teams = await db.getTeamsRanking(lastCompId);
+      return res.status(200).send(teams);
     } catch (e) {
       console.error(e);
       return res.status(500).end();

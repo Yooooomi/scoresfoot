@@ -2,9 +2,9 @@ import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import style from './style';
 import { Paper, Grid } from '@material-ui/core';
-import InlineTeam from '../../../components/InlineTeam';
+import InlineTeam from '../../../../../components/InlineTeam';
 import cl from 'classnames';
-import { describe, months } from '../../../services/date';
+import { describe, months } from '../../../../../services/date';
 
 class Matches extends React.Component {
   render() {

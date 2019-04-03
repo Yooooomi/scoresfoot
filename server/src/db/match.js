@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { pointsEarned } = require('../tools/rawTools');
 
+mongoose.set('useCreateIndex', true);
+
 mongoose.connect(`mongodb://localhost:27017/scoresfoot?authSource=admin`, {
   useNewUrlParser: true,
   user: process.env.MONGODB_USERNAME,
@@ -20,6 +22,8 @@ const UserSchema = new mongoose.Schema({
   pronos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Prono', default: [] }],
 });
 
+UserSchema.index({ pronos: 1 });
+
 const PronoSchema = new mongoose.Schema({
   match: { type: mongoose.Schema.Types.ObjectId, ref: 'Match' },
   local: Number,
@@ -27,16 +31,22 @@ const PronoSchema = new mongoose.Schema({
   coeff: Number,
 });
 
+PronoSchema.index({ match: 1 });
+
 const StepSchema = new mongoose.Schema({
   matchs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Match', default: [] }],
   name: String,
 });
+
+StepSchema.index({ matchs: 1 });
 
 const CompetitionSchema = new mongoose.Schema({
   steps: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Step', default: [] }],
   start: { type: mongoose.Schema.Types.Date },
   name: String,
 });
+
+CompetitionSchema.index({ steps: 1 });
 
 const MatchSchema = new mongoose.Schema({
   local: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
@@ -46,6 +56,8 @@ const MatchSchema = new mongoose.Schema({
   date: { type: mongoose.Schema.Types.Date },
   cote: { type: mongoose.Schema.Types.Number, default: 1 },
 });
+
+MatchSchema.index({ localScore: 1 });
 
 const TeamSchema = new mongoose.Schema({
   name: String,
@@ -83,13 +95,15 @@ async function getFullUser(field, value) {
     }
   }).lean();
 
+  console.log(userFound);
+
   let points = userFound.pronos.filter(e => e.match.localScore !== -1).reduce((acc, curr) => {
     return acc + pointsEarned(curr);
   }, 0);
 
   const todoMatches = await Match.find({
     _id: { $nin: userFound.pronos.map(e => e.match) },
-    date: { $gt: (new Date()).toISOString() },
+    //    date: { $gt: (new Date()).toISOString() },
   }).sort('date').populate('local guest');
   userFound.todos = todoMatches;
   userFound.points = points;
@@ -273,7 +287,7 @@ async function addMatch(step, localId, guestId, date) {
 }
 
 function getMatchesEndedWithoutScores() {
-  return Match.find({ localScore: -1, date: { $lt: new Date() } }).populate('local guest');
+  return Match.find({ localScore: -1, }).populate('local guest');
 }
 
 async function setMatchScore(matchId, local, guest) {
@@ -311,6 +325,343 @@ function getConfrontations(team1, team2) {
   }).sort('date');
 }
 
+async function getLastCompetition() {
+  return Competition.findOne({}).sort({ _id: -1 });
+}
+
+async function getTeamsRanking(compId) {
+  const teams = await Competition.aggregate([
+    {
+      $match: {
+        $expr: {
+          $eq: ['$_id', { $toObjectId: compId }],
+        }
+      }
+    },
+    { $unwind: '$steps' },
+    {
+      $lookup: {
+        from: 'steps',
+        as: 'stepsObject',
+        localField: 'steps',
+        foreignField: '_id',
+      }
+    },
+    { $unwind: '$stepsObject' },
+    {
+      $project: {
+        _id: 1,
+        stepsObject: 1,
+      }
+    },
+    {
+      $lookup: {
+        from: 'matches',
+        as: 'match',
+        let: { otherid: '$stepsObject.matchs' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $in: ['$_id', '$$otherid'] },
+                  { $ne: ['$localScore', -1] },
+                ]
+              }
+            }
+          }
+        ],
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        match: 1,
+      }
+    },
+    { $unwind: '$match' },
+    {
+      $group: {
+        _id: null,
+        matches: { $push: '$match' },
+        teamsl: { $addToSet: '$match.local' },
+        teamsg: { $addToSet: '$match.guest' },
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        matches: 1,
+        teams: { $setUnion: ['$teamsl', '$teamsg'] },
+      }
+    },
+    { $unwind: '$teams' },
+    // { $unwind: '$match' },
+    {
+      $project: {
+        _id: '$teams',
+        matches: {
+          $filter: {
+            input: '$matches',
+            as: 'item',
+            cond: { $or: [{ $eq: ['$$item.local', '$teams'] }, { $eq: ['$$item.guest', '$teams'] }] }
+          }
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: 'teams',
+        as: 'team',
+        localField: '_id',
+        foreignField: '_id',
+      }
+    },
+    { $unwind: '$team' }
+    // {
+    //   $group: {
+    //     _id: '$teams',
+    //     matches: { $push: { $cond: [{ $in: ['$teams', '$matches.local'] }, '$matches._id', null] } }
+    //   }
+    // }
+    // {
+    //   $group: {
+    //     _id: '$match._id',
+    //     matches: { $push: '$match._id' },
+    //     teams: {
+    //       $addToSet: { $setUnion: ['$match.local', '$match.guest'] }
+    //     }
+    //   }
+    // },
+    // {
+    //   $group: {
+    //     _id: null,
+    //     teams: { $addToSet: '$teams' },
+    //   }
+    // }
+  ]);
+
+  return { teams, competition: compId };
+}
+
+async function getPlayersRanking(compId) {
+  const comp = await Competition.findById(compId).populate({
+    path: 'steps',
+    populate: {
+      path: 'matchs',
+      model: 'Match',
+    },
+  }).lean();
+
+  if (comp.steps.length === 0) return [];
+  const ids = [];
+  comp.steps[0].matchs.forEach(e => ids.push(e.local, e.guest));
+
+  const oneYear = new Date();
+  oneYear.setFullYear(oneYear.getFullYear() - 1);
+
+  let teams = await User.aggregate([
+    {
+      $lookup: {
+        from: 'pronos',
+        localField: 'pronos',
+        foreignField: '_id',
+        as: 'pronos',
+      },
+    },
+    {
+      $lookup: {
+        from: 'matches',
+        localField: 'pronos.match',
+        foreignField: '_id',
+        as: 'pronos_match',
+      }
+    },
+    {
+      $match: {
+        pronos_match
+      }
+    }
+  ])
+  delete comp.steps;
+  return { teams, competition: comp };
+
+}
+
+async function getBestUsers(compId) {
+  compId = '5ca4c5ee9376a727e68c55ac';
+  return await Competition.aggregate([
+    {
+      $match: {
+        $expr: {
+          $eq: ['$_id', { $toObjectId: compId }],
+        }
+      }
+    },
+    { $unwind: '$steps' },
+    {
+      $lookup: {
+        from: 'steps',
+        as: 'stepsObject',
+        localField: 'steps',
+        foreignField: '_id',
+      }
+    },
+    { $unwind: '$stepsObject' },
+    {
+      $project: {
+        _id: 1,
+        stepsObject: 1,
+      }
+    },
+    {
+      $lookup: {
+        from: 'matches',
+        as: 'matchesObject',
+        let: { otherid: '$stepsObject.matchs' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $in: ['$_id', '$$otherid'] },
+                  { $ne: ['$localScore', -1] },
+                ]
+              }
+            }
+          }
+        ],
+      },
+    },
+    {
+      $project: {
+        _id: '$stepsObject._id',
+        matchesObject: 1,
+      }
+    },
+    { $unwind: '$matchesObject' },
+    {
+      $lookup: {
+        from: 'users',
+        as: 'users',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              username: 1,
+              pronos: 1,
+            }
+          }
+        ],
+      }
+    },
+    { $unwind: '$users' },
+    {
+      $lookup: {
+        from: 'pronos',
+        as: 'pronosObject',
+        let: { matchId: '$matchesObject._id', ourPronos: '$users.pronos' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$$matchId', '$match'] },
+                  { $in: ['$_id', '$$ourPronos'] },
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      $project: {
+        _id: '$_id',
+        user_id: '$users._id',
+        match: '$matchesObject',
+        prono: { $arrayElemAt: ['$pronosObject', 0] },
+      }
+    },
+    {
+      $addFields: {
+        stats: {
+          $switch: {
+            branches: [
+              {
+                case: {
+                  $and: [
+                    { $eq: ['$prono.local', '$match.localScore'] },
+                    { $eq: ['$prono.guest', '$match.guestScore'] },
+                  ],
+                },
+                then: { points: { $multiply: [3, '$prono.coeff'] }, sj: 1, bt: 0, failed: 0 },
+              },
+              {
+                case: {
+                  $and: [
+                    { $lt: [{ $subtract: ['$prono.local', '$prono.guest'] }, 0] },
+                    { $lt: [{ $subtract: ['$match.localScore', '$match.guestScore'] }, 0] }
+                  ]
+                },
+                then: { points: { $multiply: [1, '$prono.coeff'] }, sj: 0, bt: 1, failed: 0 },
+              },
+              {
+                case: {
+                  $and: [
+                    { $gt: [{ $subtract: ['$prono.local', '$prono.guest'] }, 0] },
+                    { $gt: [{ $subtract: ['$match.localScore', '$match.guestScore'] }, 0] }
+                  ]
+                },
+                then: { points: { $multiply: [1, '$prono.coeff'] }, sj: 0, bt: 1, failed: 0 },
+              },
+              {
+                case: {
+                  $and: [
+                    { $eq: [{ $subtract: ['$prono.local', '$prono.guest'] }, 0] },
+                    { $eq: [{ $subtract: ['$match.localScore', '$match.guestScore'] }, 0] }
+                  ]
+                },
+                then: { points: { $multiply: [1, '$prono.coeff'] }, sj: 0, bt: 1, failed: 0 },
+              },
+            ],
+            default: { points: { $multiply: [-1, '$prono.coeff'] }, sj: 0, bt: 0, failed: 1 },
+          }
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$user_id',
+        points: { $sum: '$stats.points' },
+        sj: { $sum: '$stats.sj' },
+        bt: { $sum: '$stats.bt' },
+        failed: { $sum: '$stats.failed' },
+        pronos: { $sum: 1 },
+        totalCoeff: { $sum: '$prono.coeff' },
+        goals: { $sum: { $add: ['$prono.local', '$prono.guest'] } }
+      }
+    },
+    {
+      $sort: {
+        'stats.points': 1,
+      }
+    },
+    {
+      $limit: 50,
+    },
+    {
+      $lookup: {
+        from: 'users',
+        as: 'user',
+        localField: '_id',
+        foreignField: '_id',
+      }
+    },
+    { $unwind: '$user' },
+  ]);
+}
+
 module.exports = {
   getUser,
   getFullUser,
@@ -333,4 +684,7 @@ module.exports = {
   getCompetitions,
   getCompetition,
   getConfrontations,
+  getLastCompetition,
+  getTeamsRanking,
+  getBestUsers,
 };

@@ -10,4 +10,6 @@ export default ({
   myPronos: '/my_pronos',
   modifyMatches: '/modify_matches',
   team: '/team/:id',
+  teamRanking: '/teams/ranking',
+  userRanking: '/users/ranking',
 });

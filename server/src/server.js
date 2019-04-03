@@ -50,6 +50,7 @@ app.use(require('./routes/accounts')(passport));
 app.use(require('./routes/match')());
 app.use(require('./routes/prono')());
 app.use(require('./routes/teams')());
+app.use(require('./routes/users')());
 
 app.get('/api/hello', (req, res) => {
   res.status(200).send('Hello, world!');

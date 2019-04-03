@@ -16,6 +16,8 @@ const LogState = {
 
 const modules = [
   { name: 'My account', link: urls.home, log: LogState.NEEDLOG },
+  { name: 'Classement', link: urls.teamRanking, log: LogState.NEEDLOG },
+  { name: 'Classement Joueurs', link: urls.userRanking, log: LogState.NEEDLOG },
   { name: 'Pronostic', link: '/prono', log: LogState.NEEDLOG },
   { name: 'My pronos', link: urls.myPronos, log: LogState.NEEDLOG },
   { name: 'Add match', link: '/add_match', log: LogState.NEEDLOG, admin: true },

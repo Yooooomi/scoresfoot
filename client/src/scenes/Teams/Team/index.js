@@ -1,10 +1,10 @@
 import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import style from './style';
-import api from '../../services/api';
+import api from '../../../services/api';
 import { Grid, Paper } from '@material-ui/core';
-import { getPointsId } from '../../services/match';
-import Matches from './Matches';
+import { getPointsId, getSeasonStats } from '../../../services/match';
+import Matches from './components/Matches';
 
 class Team extends React.Component {
 
@@ -17,7 +17,7 @@ class Team extends React.Component {
   refresh = async () => {
     const teamId = this.props.match.params.id;
 
-    const team = await api.get(`/teams/${teamId}`);
+    const team = await api.get(`/teams/team/${teamId}`);
     this.setState({ team: team.data }, () => this.forceUpdate());
   }
 
@@ -43,24 +43,7 @@ class Team extends React.Component {
     const playedMatches = team.history.filter(m => m.localScore !== -1);
 
     console.log(playedMatches.length);
-    const stats = playedMatches.reduce((acc, curr) => {
-      const points = getPointsId(team._id, curr);
-
-      acc.points += points;
-      if (points === 3) acc.wins++;
-      else if (points === 1) acc.draws++;
-      else acc.losses++;
-      acc.goals += (team._id === curr.local._id ? curr.localScore : curr.guestScore);
-      acc.t_goals += (team._id === curr.local._id ? curr.guestScore : curr.localScore);
-      return acc;
-    }, {
-      points: 0,
-      wins: 0,
-      losses: 0,
-      draws: 0,
-      goals: 0,
-      t_goals: 0,
-    });
+    const stats = getSeasonStats(team, playedMatches);
 
     const matchs = playedMatches.reverse().map(e => (
       <Matches match={e} key={e._id} winningTeam={team._id} className={classes.matches} />
