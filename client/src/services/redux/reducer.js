@@ -33,9 +33,22 @@ const readyReducer = (state = initialReady, action) => {
   }
 };
 
+const initialMatches = {};
+
+const matchesReducer = (state = initialMatches, action) => {
+  switch (action.type) {
+  case 'ADD_MATCH':
+    state.matches[action.match._id] = action.match;
+    return { ...state };
+  default:
+    return state;
+  }
+};
+
 const rootReducer = combineReducers({
   userReducer: userReducer,
   readyReducer: readyReducer,
+  matchesReducer: matchesReducer,
 });
 
 const store = createStore(rootReducer);

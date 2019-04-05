@@ -12,4 +12,5 @@ export default ({
   team: '/team/:id',
   teamRanking: '/teams/ranking',
   userRanking: '/users/ranking',
+  viewUser: '/user/:id',
 });

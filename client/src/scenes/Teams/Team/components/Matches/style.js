@@ -15,9 +15,9 @@ export default theme => ({
 
   },
   win: {
-    background: 'rgb(119, 216, 67)',
+    background: theme.palette.success.main,
   },
   loss: {
-    background: 'rgb(255, 81, 81)',
+    background: theme.palette.error.main,
   }
 });

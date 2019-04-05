@@ -41,6 +41,35 @@ module.exports = function () {
     }
   });
 
+  const getLastSchema = Joi.object().keys({
+    number: Joi.number().min(0).max(50).default(10),
+    offset: Joi.number().min(0).default(0),
+  });
+
+  routes.get('/match/getlast', validate(getLastSchema, 'query'), isLogged, async (req, res) => {
+    const { number, offset } = req.value;
+
+    try {
+      const matches = await db.getMatches(offset, number);
+      return res.status(200).send(matches);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
+  routes.get('/match/get/:id', isLogged, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const match = await db.getMatch('_id', id, true);
+      return res.status(200).send(match);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).end();
+    }
+  });
+
   const modifyMatchSchema = Joi.object().keys({
     matchId: Joi.string().required(),
     date: Joi.any().required(),

@@ -11,6 +11,12 @@ import PropTypes from 'prop-types';
 import { withWidth } from '@material-ui/core';
 import { isWidthDown } from '@material-ui/core/withWidth';
 
+const orderStats = (path, asc = 1) => (a, b) => {
+  if (a[path] > b[path]) return 1 * asc;
+  if (a[path] < b[path]) return -1 * asc;
+  return 0;
+};
+
 class SimpleTable extends React.Component {
   constructor(props) {
     super(props);
@@ -49,13 +55,23 @@ class SimpleTable extends React.Component {
               if (!shouldRenders[k]) return null;
               let otherProps = {};
               if (e.sort) {
-                otherProps.onClick = () => {
-                  this.setState({
-                    data: data.sort((a, b) => this.orders[e.key] * e.sort(a, b)),
-                    current: e.key,
-                  });
-                  this.orders[e.key] *= -1;
-                };
+                if (typeof e.sort === 'string' && e.sort === 'auto') {
+                  otherProps.onClick = () => {
+                    this.setState({
+                      data: data.sort((a, b) => this.orders[e.key] * orderStats(e.key)(a, b)),
+                      current: e.key,
+                    });
+                    this.orders[e.key] *= -1;
+                  };
+                } else {
+                  otherProps.onClick = () => {
+                    this.setState({
+                      data: data.sort((a, b) => this.orders[e.key] * e.sort(a, b)),
+                      current: e.key,
+                    });
+                    this.orders[e.key] *= -1;
+                  };
+                }
               }
               return <TableCell key={k} {...otherProps} style={columnStyle} className={columnClassName}>
                 <TableSortLabel direction={this.orders[e.key] === 1 ? 'asc' : 'desc'} active={this.state.current === e.key} >
