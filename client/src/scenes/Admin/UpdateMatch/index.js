@@ -50,7 +50,7 @@ class UpdateMatch extends React.Component {
 
     try {
       await api.post('/match/setscore', {
-        matchId: matches[ndx]._id,
+        matchId: matches[ndx].id,
         localScore: local[ndx],
         guestScore: guest[ndx],
       });
@@ -77,7 +77,7 @@ class UpdateMatch extends React.Component {
             <NoMatch />
           ) : (
             matches.map((e, k) => (
-              <Grid container key={e._id} alignItems={'center'}>
+              <Grid container key={e.id} alignItems={'center'}>
                 <Grid item xs={3}>
                   <InlineTeam team={e.local} />
                 </Grid>

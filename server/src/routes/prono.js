@@ -1,12 +1,12 @@
 const routes = require('express').Router();
 const { isLogged, validate, validMatch } = require('../tools/tools');
 const Joi = require('joi');
-const db = require('../db/match');
+const dbProno = require('../db/prono');
 
 module.exports = function () {
 
   const pronoSchema = Joi.object().keys({
-    matchId: Joi.string().required(),
+    matchId: Joi.number().required(),
     local: Joi.number().min(0).max(10).required(),
     guest: Joi.number().min(0).max(10).required(),
     coeff: Joi.number().min(0).max(10).required(),
@@ -16,7 +16,7 @@ module.exports = function () {
     const { matchId, local, guest, coeff } = req.body;
 
     try {
-      await db.writeProno(req.user._id, matchId, local, guest, coeff);
+      await dbProno.writeProno(req.user.id, matchId, local, guest, coeff);
       return res.status(200).end();
     } catch (e) {
       console.error(e);
@@ -31,7 +31,7 @@ module.exports = function () {
     const { matchId, local, guest, coeff } = req.body;
 
     try {
-      db.modifyProno(req.user._id, matchId, local, guest, coeff);
+      dbProno.modifyProno(req.user.id, matchId, local, guest, coeff);
       return res.status(200).end();
     } catch (e) {
       if (e.code === 'NOT_FOUND') return res.status(400).end();
@@ -40,5 +40,4 @@ module.exports = function () {
   });
 
   return routes;
-
 }

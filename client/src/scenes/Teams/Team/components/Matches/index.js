@@ -15,11 +15,11 @@ class Matches extends React.Component {
     let state = 'draw';
 
     if (match.localScore > match.guestScore) {
-      if (match.local._id === winningTeam) state = 'win';
-      if (match.guest._id === winningTeam) state = 'loss';
+      if (match.local.id === winningTeam) state = 'win';
+      if (match.guest.id === winningTeam) state = 'loss';
     } else if (match.localScore < match.guestScore) {
-      if (match.local._id === winningTeam) state = 'loss';
-      if (match.guest._id === winningTeam) state = 'win';
+      if (match.local.id === winningTeam) state = 'loss';
+      if (match.guest.id === winningTeam) state = 'win';
     }
 
     return (
@@ -32,7 +32,7 @@ class Matches extends React.Component {
             <Grid item xs={2}>
               <span className={classes.middle}>
                 <span className={classes.score}>
-                  {match.localScore} - {match.guestScore}
+                  {match.local_score} - {match.guest_score}
                 </span>
                 <br />
                 {date.day} {months[date.month]} {date.year} à {date.hours}:{(date.minutes < 10 ? '0' : '') + date.minutes}

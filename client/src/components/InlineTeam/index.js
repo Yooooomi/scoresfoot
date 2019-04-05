@@ -15,7 +15,7 @@ class InlineTeam extends React.Component {
             <img src={'/default_team.png'} alt={'team'} className={classes.logo} />
           </Grid>
           <Grid item xs={'auto'}>
-            <Link to={urls.team.replace(':id', team._id)}><span className={classes.name}>{team.name}</span></Link>
+            <Link to={urls.team.replace(':id', team.id)}><span className={classes.name}>{team.name}</span></Link>
           </Grid>
         </Grid>
       </div>

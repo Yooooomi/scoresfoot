@@ -1,6 +1,6 @@
 const routes = require('express').Router();
 const LocalStrategy = require('passport-local').Strategy;
-const db = require('../db/match');
+const dbUser = require('../db/user');
 const bcrypt = require('bcryptjs');
 const Joi = require('joi');
 const { validate, isLogged } = require('../tools/tools');
@@ -15,7 +15,7 @@ module.exports = function (passport) {
     async (username, password, done) => {
       let user = null;
       try {
-        user = await db.getFullUser('username', username);
+        user = await dbUser.getFullUser('username', username);
       }
       catch (e) {
         console.error(e);
@@ -30,11 +30,11 @@ module.exports = function (passport) {
   );
 
   passport.serializeUser(function (user, done) {
-    done(null, user._id);
+    done(null, user.id);
   });
 
   passport.deserializeUser(function (id, done) {
-    db.getFullUser('_id', id)
+    dbUser.getFullUser('id', id)
       .then(u => done(null, u))
       .catch(e => done(null, null));
   });
@@ -48,7 +48,7 @@ module.exports = function (passport) {
     const { username, password } = req.body;
 
     try {
-      await db.registerUser(username, password);
+      await dbUser.registerUser(username, password);
       res.status(200).end();
     } catch (e) {
       console.error(e);

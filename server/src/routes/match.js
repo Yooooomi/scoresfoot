@@ -1,7 +1,8 @@
 const routes = require('express').Router();
 const { isLogged, validate, validMatch, isAdmin } = require('../tools/tools');
 const Joi = require('joi');
-const db = require('../db/match');
+const dbMatch = require('../db/match');
+const dbCompet = require('../db/competition');
 
 module.exports = function () {
 
@@ -14,7 +15,7 @@ module.exports = function () {
     const { name, start } = req.body;
 
     try {
-      const newcomp = await db.newCompetition(name, start);
+      const newcomp = await dbCompet.newCompetition(name);
       return res.status(200).send(newcomp);
     } catch (e) {
       console.error(e);
@@ -24,7 +25,7 @@ module.exports = function () {
 
   routes.get('/competition/getall', isLogged, async (req, res) => {
     try {
-      const comps = await db.getCompetitions();
+      const comps = await dbCompet.getCompetitions();
       return res.status(200).send(comps);
     } catch (e) {
       return res.status(500).end();
@@ -33,7 +34,7 @@ module.exports = function () {
 
   routes.get('/competition/step/:id', isLogged, async (req, res) => {
     try {
-      const step = await db.getStep(req.params.id);
+      const step = await dbCompet.getStep(req.params.id);
       return res.status(200).send(step);
     } catch (e) {
       console.error(e);
@@ -50,7 +51,7 @@ module.exports = function () {
     const { number, offset } = req.value;
 
     try {
-      const matches = await db.getMatches(offset, number);
+      const matches = await dbMatch.getMatches(offset, number);
       return res.status(200).send(matches);
     } catch (e) {
       console.error(e);
@@ -62,7 +63,7 @@ module.exports = function () {
     const { id } = req.params;
 
     try {
-      const match = await db.getMatch('_id', id, true);
+      const match = await dbMatch.getMatch('id', id, true);
       return res.status(200).send(match);
     } catch (e) {
       console.error(e);
@@ -71,7 +72,7 @@ module.exports = function () {
   });
 
   const modifyMatchSchema = Joi.object().keys({
-    matchId: Joi.string().required(),
+    matchId: Joi.number().required(),
     date: Joi.any().required(),
   });
 
@@ -79,7 +80,7 @@ module.exports = function () {
     const { matchId, date } = req.body;
 
     try {
-      await db.updateMatch(matchId, new Date(date));
+      await dbMatch.updateMatch(matchId, new Date(date));
       return res.status(200).end();
     } catch (e) {
       console.error(e);
@@ -88,14 +89,14 @@ module.exports = function () {
   });
 
   const removeMatchSchema = Joi.object().keys({
-    matchId: Joi.string().required(),
+    matchId: Joi.number().required(),
   });
 
   routes.post('/match/delete', validate(removeMatchSchema), isLogged, isAdmin, async (req, res) => {
     const { matchId } = req.body;
 
     try {
-      await db.removeMatch(matchId);
+      await dbMatch.removeMatch(matchId);
       return res.status(200).end();
     } catch (e) {
       console.error(e);
@@ -107,7 +108,7 @@ module.exports = function () {
     const { id } = req.params;
 
     try {
-      const comp = await db.getCompetition(id);
+      const comp = await dbCompet.getCompetition(id);
       return res.status(200).send(comp);
     } catch (e) {
       return res.status(500).end();
@@ -115,7 +116,7 @@ module.exports = function () {
   });
 
   const newStepSchema = Joi.object().keys({
-    competitionId: Joi.string().required(),
+    competitionId: Joi.number().required(),
     name: Joi.string().required(),
   });
 
@@ -123,7 +124,7 @@ module.exports = function () {
     const { competitionId, name } = req.body;
 
     try {
-      const step = await db.newStep(competitionId, name);
+      const step = await dbCompet.newStep(competitionId, name);
       return res.status(200).send(step);
     } catch (e) {
       console.error(e);
@@ -132,9 +133,9 @@ module.exports = function () {
   });
 
   const newMatchSchema = Joi.object().keys({
-    stepId: Joi.string().required(),
-    local: Joi.string().required(),
-    guest: Joi.string().required(),
+    stepId: Joi.number().required(),
+    local: Joi.number().required(),
+    guest: Joi.number().required(),
     date: Joi.any().required(),
   });
 
@@ -142,7 +143,7 @@ module.exports = function () {
     const { local, guest, date, stepId } = req.body;
 
     try {
-      await db.addMatch(stepId, local, guest, date);
+      await dbMatch.addMatch(stepId, local, guest, date);
       return res.status(200).end();
     } catch (e) {
       console.error(e);
@@ -163,7 +164,9 @@ module.exports = function () {
     const { local, guest, date, stepName, localScore, guestScore } = req.body;
 
     try {
-      await db.addMatchNames(date, stepName, local, guest, localScore, guestScore);
+      console.log('here');
+      await dbMatch.addMatchNames(date, stepName, local, guest, localScore, guestScore);
+      console.log('here');
       return res.status(200).end();
     } catch (e) {
       console.error(e);
@@ -173,7 +176,7 @@ module.exports = function () {
 
   routes.get('/match/needupdate', async (req, res) => {
     try {
-      const matches = await db.getMatchesEndedWithoutScores();
+      const matches = await dbMatch.getMatchesEndedWithoutScore();
       return res.status(200).send(matches);
     } catch (e) {
       console.error(e);
@@ -182,7 +185,7 @@ module.exports = function () {
   });
 
   const setScoreSchema = Joi.object().keys({
-    matchId: Joi.string().required(),
+    matchId: Joi.number().required(),
     localScore: Joi.number().required().min(0),
     guestScore: Joi.number().required().min(0),
   });
@@ -191,7 +194,7 @@ module.exports = function () {
     const { matchId, localScore, guestScore } = req.body;
 
     try {
-      await db.setMatchScore(matchId, localScore, guestScore);
+      await dbMatch.setMatchScore(matchId, localScore, guestScore);
       return res.status(200).end();
     } catch (e) {
       console.error(e);

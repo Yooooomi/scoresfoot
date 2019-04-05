@@ -51,7 +51,7 @@ async function main() {
   for (let day of days) {
     const step = (await axios.post('http://localhost:8081/competition/newstep', {
       name: `Journee ${daynb}`,
-      competitionId: compet._id,
+      competitionId: compet.id,
     })).data;
     console.log('Created step', 'Journee', daynb);
     daynb++;

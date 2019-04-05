@@ -1,5 +1,5 @@
 export function getPointsId(team, match) {
-  if (team === match.local._id) {
+  if (team === match.local.id) {
     if (match.localScore > match.guestScore) return 3;
     if (match.localScore === match.guestScore) return 1;
     if (match.localScore < match.guestScore) return 0;
@@ -22,20 +22,28 @@ export function getPoints(team, match) {
   }
 }
 
+export function getPronoPoints(prono) {
+  if (prono.local_score === prono.match.local_score && prono.guest_score === prono.match.guest_score) return 3;
+  if (prono.local_score - prono.guest_score < 0 && prono.match.local_score - prono.match.guest_score < 0) return 1;
+  if (prono.local_score - prono.guest_score > 0 && prono.match.local_score - prono.match.guest_score > 0) return 1;
+  if (prono.local_score - prono.guest_score === 0 && prono.match.local_score - prono.match.guest_score === 0) return 1;
+  return 0;
+}
+
 export function getSeasonStats(team, matchs, matchPopulated = false) {
   return matchs.reduce((acc, curr) => {
-    const points = getPoints(team._id, curr);
+    const points = getPoints(team.id, curr);
 
     acc.points += points;
     if (points === 3) acc.wins++;
     else if (points === 1) acc.draws++;
     else acc.losses++;
     if (matchPopulated) {
-      acc.goals += (team._id === curr.local._id ? curr.localScore : curr.guestScore);
-      acc.t_goals += (team._id === curr.local._id ? curr.guestScore : curr.localScore);
+      acc.goals += (team.id === curr.local.id ? curr.localScore : curr.guestScore);
+      acc.t_goals += (team.id === curr.local.id ? curr.guestScore : curr.localScore);
     } else {
-      acc.goals += (team._id === curr.local ? curr.localScore : curr.guestScore);
-      acc.t_goals += (team._id === curr.local ? curr.guestScore : curr.localScore);
+      acc.goals += (team.id === curr.local ? curr.localScore : curr.guestScore);
+      acc.t_goals += (team.id === curr.local ? curr.guestScore : curr.localScore);
     }
     acc.played++;
     return acc;

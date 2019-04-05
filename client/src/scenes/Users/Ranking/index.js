@@ -35,13 +35,11 @@ class UserRanking extends React.Component {
     const { classes, user } = this.props;
     const { users } = this.state;
 
-    console.log(users);
-
     const columns = [
       {
         name: 'name',
         key: 'username',
-        render: (el, k, props) => <Link to={urls.viewUser.replace(':id', el._id)}><span className={user.username === el.username ? classes.me : ''}>{el.username}</span></Link>,
+        render: (el, k, props) => <Link to={urls.viewUser.replace(':id', el.id)}><span className={user.username === el.username ? classes.me : ''}>{el.username}</span></Link>,
         sort: 'auto',
       },
       {
@@ -71,12 +69,12 @@ class UserRanking extends React.Component {
       },
       {
         name: 'points pariés',
-        key: 'totalCoeff',
+        key: 'bet',
         sort: 'auto',
       },
       {
         name: 'moy. pariés',
-        render: (el, k, props) => <span>{Math.round(el.totalCoeff / el.pronos * 100) / 100}</span>
+        render: (el, k, props) => <span>{Math.round(el.bet / el.pronos * 100) / 100}</span>
       },
       {
         name: 'pts/match',
@@ -89,12 +87,10 @@ class UserRanking extends React.Component {
       },
     ];
 
-    const usersData = users.map(e => ({ ...e.user, ...e }));
-
     return (
       <div className={classes.root}>
         <Title>Classement pour {'TODO'}</Title>
-        <SimpleTable columns={columns} data={usersData} className={classes.table} />
+        <SimpleTable columns={columns} data={users} className={classes.table} />
       </div>
     );
   }

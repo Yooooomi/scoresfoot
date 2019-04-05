@@ -6,6 +6,8 @@ import { mapStateToProps, mapDispatchToProps } from '../../services/redux/tools'
 import InlineTeam from '../../components/InlineTeam';
 import { Grid, Paper } from '@material-ui/core';
 import Title from '../../components/Title';
+import { getPronoPoints } from '../../services/match';
+import cl from 'classnames';
 
 class Pronos extends React.Component {
 
@@ -15,20 +17,41 @@ class Pronos extends React.Component {
       <div className={classes.root}>
         <Title>Vos pronos</Title>
         {
-          user.pronos.map(e => (
-            <Paper key={e._id} className={classes.paper}>
-              <Grid container alignItems={'center'}>
-                <Grid item xs={4}>
-                  <InlineTeam team={e.match.local} />
+          user.pronos.map(e => {
+            const multiplier = getPronoPoints(e);
+            let className = '';
+            if (e.match.local_score !== -1)
+              if (multiplier === 3) className = 'win';
+              else if (multiplier === 1) className = '';
+              else className = 'loss';
+            return (
+              <Paper key={e.match_id} className={cl(classes.paper, classes[className])}>
+                <Grid container alignItems={'center'}>
+                  <Grid item xs={4}>
+                    <InlineTeam team={e.match.local} />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <span className={classes.pronoScore}>{e.local_score} - {e.guest_score}</span>
+                    {
+                      e.match.local_score !== -1 && <div><br />{e.match.local_score} - {e.match.guest_score}</div>
+                    }
+                  </Grid>
+                  <Grid item xs={4}>
+                    <InlineTeam right team={e.match.guest} />
+                  </Grid>
+                  <Grid item xs={2}>Coeff: {e.coeff}<br />
+                    {
+                      e.match.local_score !== -1 ? (
+                        <span>Gains: {getPronoPoints(e)}</span>
+                      ) : (
+                        <span>Gain max. {e.coeff * 3}</span>
+                      )
+                    }
+                  </Grid>
                 </Grid>
-                <Grid item xs={2}>{e.local} - {e.guest}</Grid>
-                <Grid item xs={4}>
-                  <InlineTeam right team={e.match.local} />
-                </Grid>
-                <Grid item xs={2}>Coeff: {e.coeff}<br />Gain max. {e.coeff * 3}</Grid>
-              </Grid>
-            </Paper>
-          ))
+              </Paper>
+            )
+          })
         }
       </div>
     );

@@ -39,14 +39,15 @@ class Team extends React.Component {
     const { team } = this.state;
 
     if (!team) return null;
+    console.log(team);
 
-    const playedMatches = team.history.filter(m => m.localScore !== -1);
+    const playedMatches = team.matches.filter(m => m.localScore !== -1);
 
     console.log(playedMatches.length);
     const stats = getSeasonStats(team, playedMatches);
 
     const matchs = playedMatches.reverse().map(e => (
-      <Matches match={e} key={e._id} winningTeam={team._id} className={classes.matches} />
+      <Matches match={e} key={e.id} winningTeam={team.id} className={classes.matches} />
     ));
 
     return (

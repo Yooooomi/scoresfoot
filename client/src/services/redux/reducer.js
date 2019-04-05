@@ -38,7 +38,7 @@ const initialMatches = {};
 const matchesReducer = (state = initialMatches, action) => {
   switch (action.type) {
   case 'ADD_MATCH':
-    state.matches[action.match._id] = action.match;
+    state.matches[action.match.id] = action.match;
     return { ...state };
   default:
     return state;

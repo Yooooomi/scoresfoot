@@ -1,7 +1,9 @@
 const routes = require('express').Router();
 const { isLogged, validate, validMatch, isAdmin } = require('../tools/tools');
 const Joi = require('joi');
-const db = require('../db/match');
+const dbTeam = require('../db/team');
+const dbRanking = require('../db/ranking');
+const dbCompet = require('../db/competition');
 
 module.exports = function () {
 
@@ -13,10 +15,8 @@ module.exports = function () {
   routes.post('/teams/new', validate(newTeamSchema), isLogged, isAdmin, async (req, res) => {
     const { name, logo } = req.body;
 
-    console.log('Creating', name);
-
     try {
-      const team = await db.addTeam(name, logo);
+      const team = await dbTeam.addTeam(name, logo);
       res.status(200).send(team);
     } catch (e) {
       console.error(e);
@@ -26,7 +26,7 @@ module.exports = function () {
 
   routes.get('/teams', async (req, res) => {
     try {
-      const teams = await db.getTeams();
+      const teams = await dbTeam.getTeams();
       return res.status(200).send(teams);
     } catch (e) {
       console.error(e);
@@ -38,7 +38,7 @@ module.exports = function () {
     const { id } = req.params;
 
     try {
-      const team = await db.getTeam(id);
+      const team = await dbTeam.getTeam(id);
       return res.status(200).send(team);
     } catch (e) {
       console.error(e);
@@ -47,15 +47,15 @@ module.exports = function () {
   });
 
   const confrontationSchema = Joi.object().keys({
-    team1: Joi.string().required(),
-    team2: Joi.string().required(),
+    team1: Joi.number().required(),
+    team2: Joi.number().required(),
   });
 
   routes.get('/teams/confrontation', validate(confrontationSchema, 'query'), async (req, res) => {
     const { team1, team2 } = req.value;
 
     try {
-      const confrontations = await db.getConfrontations(team1, team2);
+      const confrontations = await dbTeam.getConfrontations(team1, team2);
       return res.status(200).send(confrontations);
     } catch (e) {
       console.error(e);
@@ -66,12 +66,10 @@ module.exports = function () {
   routes.get('/teams/ranking', async (req, res) => {
     let lastCompId = req.query.compId;
 
-    console.log(lastCompId);
-
     try {
       if (!lastCompId)
-        lastCompId = (await db.getLastCompetition())._id;
-      const teams = await db.getTeamsRanking(lastCompId);
+        lastCompId = (await dbCompet.getLastCompetition()).id;
+      const teams = await dbRanking.getTeamsRanking(lastCompId);
       return res.status(200).send(teams);
     } catch (e) {
       console.error(e);

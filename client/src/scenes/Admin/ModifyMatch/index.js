@@ -30,7 +30,7 @@ class ModifyMatch extends React.Component {
   selectStep = async value => {
     this.setState({ selectStep: value });
     try {
-      const matches = await api.get(`/competition/step/${value.value._id}`);
+      const matches = await api.get(`/competition/step/${value.value.id}`);
       console.log(matches.data);
       this.setState({ selectStepData: matches.data });
     } catch (e) {
@@ -40,7 +40,7 @@ class ModifyMatch extends React.Component {
 
   selectComp = async value => {
     try {
-      const comp = (await api.get(`/competition/${value.value._id}`)).data;
+      const comp = (await api.get(`/competition/${value.value.id}`)).data;
 
       let newState = {
         steps: comp.steps,
@@ -66,18 +66,18 @@ class ModifyMatch extends React.Component {
 
     console.log('index', index);
 
-    selectStepData.matchs[index].modified = true;
-    selectStepData.matchs[index].date = newTime;
+    selectStepData.matches[index].modified = true;
+    selectStepData.matches[index].date = newTime;
     this.setState({ selectStepData });
   }
 
   save = async () => {
     const { selectStepData } = this.state;
 
-    for (let m of selectStepData.matchs) {
+    for (let m of selectStepData.matches) {
       if (m.modified) {
         await api.post('/match/update', {
-          matchId: m._id,
+          matchId: m.id,
           date: m.date.toISOString(),
         });
       }
@@ -103,8 +103,8 @@ class ModifyMatch extends React.Component {
 
     let matches = [];
     if (selectStep && selectStepData) {
-      matches = selectStepData.matchs.map((e, k) => (
-        <ModifyableMatch onChange={this.modifyTime(k)} className={classes.modify} key={e._id} match={e} />
+      matches = selectStepData.matches.map((e, k) => (
+        <ModifyableMatch onChange={this.modifyTime(k)} className={classes.modify} key={e.id} match={e} />
       ));
     }
 

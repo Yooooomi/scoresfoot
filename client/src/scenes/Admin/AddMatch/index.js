@@ -26,8 +26,10 @@ class AddMatch extends React.Component {
     let teams = api.get('/teams');
     let competitions = api.get('/competition/getall');
 
+
     teams = await teams;
     competitions = await competitions;
+    console.log(competitions.data);
 
     competitions.data.reverse();
 
@@ -37,7 +39,7 @@ class AddMatch extends React.Component {
     if (competitions.data.length > 0) {
       this.changeComp({
         label: competitions.data[0].name,
-        value: { _id: competitions.data[0]._id },
+        value: { id: competitions.data[0].id },
       });
     }
   }
@@ -54,7 +56,7 @@ class AddMatch extends React.Component {
 
   changeComp = (value) => {
     this.setState({ comp: value });
-    api.get(`/competition/${value.value._id}`)
+    api.get(`/competition/${value.value.id}`)
       .then(r => {
         r.data.steps.reverse();
         let newState = {
@@ -82,9 +84,9 @@ class AddMatch extends React.Component {
     for (let i in local) {
       if (local[i] && guest[i]) {
         await api.post('/match/new', {
-          stepId: step.value._id,
-          local: local[i].value._id,
-          guest: guest[i].value._id,
+          stepId: step.value.id,
+          local: local[i].value.id,
+          guest: guest[i].value.id,
           date,
         });
       }
@@ -127,11 +129,12 @@ class AddMatch extends React.Component {
   }
 
   addStep = async () => {
+    console.log(this.state);
     await api.post('/competition/newstep', {
-      competitionId: this.state.comp.value._id,
+      competitionId: this.state.comp.value.id,
       name: this.state.createName,
     });
-    const compet = await api.get(`/competition/${this.state.comp.value._id}`);
+    const compet = await api.get(`/competition/${this.state.comp.value.id}`);
     compet.data.steps.reverse();
     this.setState({
       comp: {

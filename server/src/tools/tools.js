@@ -29,7 +29,7 @@ function validate(schema, target = 'body') {
 
 function validMatch(location) {
   return async function(req, res, next) {
-    const match = await db.getMatch('_id', req[location].matchId);
+    const match = await db.getMatch('id', req[location].matchId);
 
     if (!match) return res.status(400).end();
     return next();

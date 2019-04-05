@@ -1,2 +1,0 @@
-DROP DATABASE IF EXISTS scoresfoot;
-CREATE DATABASE scoresfoot;

@@ -51,12 +51,12 @@ class Prono extends React.Component {
 
   makeProno = async () => {
     const match = this.props.user.todos[0];
-    const { _id } = match;
+    const { id } = match;
     const { localBet, guestBet, coeff } = this.state;
 
     try {
       await api.post('/prono/pronostic', {
-        matchId: _id,
+        matchId: id,
         local: localBet,
         guest: guestBet,
         coeff: coeff,

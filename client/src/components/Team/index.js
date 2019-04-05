@@ -11,7 +11,7 @@ class Team extends React.Component {
     return (
       <div className={cl(classes.root, className)}>
         <img src={'/default_team.png'} alt={'team'} className={classes.logo} />
-        <Link to={urls.team.replace(':id', team._id)}><span>{team.name}</span></Link>
+        <Link to={urls.team.replace(':id', team.id)}><span>{team.name}</span></Link>
       </div>
     );
   }

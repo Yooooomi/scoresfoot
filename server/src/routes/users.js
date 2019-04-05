@@ -1,7 +1,8 @@
 const routes = require('express').Router();
 const { isLogged, validate, validMatch, isAdmin } = require('../tools/tools');
 const Joi = require('joi');
-const db = require('../db/match');
+const dbRanking = require('../db/ranking');
+const dbCompet = require('../db/competition');
 
 module.exports = function () {
 
@@ -9,7 +10,7 @@ module.exports = function () {
     const { id } = req.params;
 
     try {
-      const stats = await db.getUserStats(id, 'TODO');
+      const stats = await dbRanking.getUserStats(id, 'TODO');
       return res.status(200).send(stats);
     } catch (e) {
       console.error(e);
@@ -19,7 +20,8 @@ module.exports = function () {
 
   routes.get('/users/ranking', async (req, res) => {
     try {
-      const users = await db.getBestUsers();
+      const lastCompet = await dbCompet.getLastCompetition();
+      const users = await dbRanking.getUserRanking(lastCompet.id);
       return res.status(200).send(users);
     } catch (e) {
       console.error(e);
