@@ -11,7 +11,9 @@ export function post(path, content) {
 
 export function get(path, data) {
   return axios.get(path, {
-    data,
+    params: {
+      ...data,
+    }
   });
 }
 

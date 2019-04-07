@@ -22,8 +22,8 @@ export default theme => ({
   },
   content: {
     display: 'flex',
-    flex: 8,
-    padding: '50px 50px',
+    flex: 9,
+    padding: '25px',
     width: '100%',
     position: 'relative',
   },

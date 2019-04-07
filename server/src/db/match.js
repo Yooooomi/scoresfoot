@@ -50,7 +50,8 @@ const getMatchesEndedWithoutScore = () => {
 };
 
 const getConfrontations = (id1, id2) => {
-  return Match.query().where('local', id1).andWhere('guest', id2).orWhere('local', id2).andWhere('guest', id1).orderBy('date');
+  console.log(Match.query().where('local_team_id', id1).andWhere('guest_team_id', id2).orWhere('local_team_id', id2).andWhere('guest_team_id', id1).orderBy('date').toSql())
+  return Match.query().where('local_team_id', id1).andWhere('guest_team_id', id2).orWhere('local_team_id', id2).andWhere('guest_team_id', id1).orderBy('date');
 };
 
 module.exports = {

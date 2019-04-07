@@ -1,6 +1,7 @@
 export default theme => ({
   root: {
     margin: '0 auto',
+    width: '100%',
   },
   team: {
     width: '30%',

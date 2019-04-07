@@ -1,9 +1,11 @@
 export default theme => ({
   root: {
-    
   },
   paper: {
     padding: '12px',
+  },
+  middleContainer: {
+    textAlign: 'center',
   },
   middle: {
     lineHeight: '40px',

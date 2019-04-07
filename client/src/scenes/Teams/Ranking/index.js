@@ -2,15 +2,11 @@ import React from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import style from './style';
 import api from '../../../services/api';
-import { getSeasonStats, ezSort } from '../../../services/match';
+import { getSeasonStats, ezSort, orderStats } from '../../../services/match';
 import SimpleTable from '../../../components/SimpleTable';
 import Title from '../../../components/Title';
-
-const orderStats = (path, asc = 1) => (a, b) => {
-  if (a[path] > b[path]) return 1 * asc;
-  if (a[path] < b[path]) return -1 * asc;
-  return 0;
-};
+import urls from '../../../services/urls';
+import { Link } from 'react-router-dom';
 
 class Ranking extends React.Component {
 
@@ -35,14 +31,8 @@ class Ranking extends React.Component {
 
     if (!teams || !comp) return null;
 
-    let stats = teams.map(e => ({
-      ...getSeasonStats(e.team, e.matches),
-      ...e.team,
-    })
-    );
-
-    stats = stats.sort(orderStats('points', -1));
-    stats.forEach((e, k) => e.rank = k);
+    teams.sort(orderStats('points', -1));
+    teams.forEach((e, k) => e.rank = k);
 
     const columns = [
       {
@@ -54,6 +44,7 @@ class Ranking extends React.Component {
       {
         key: 'name',
         name: 'Nom',
+        render: (el, k, props) => <Link to={urls.team.replace(':id', el.id)}><span>{el.name}</span></Link>,
         sort: orderStats('name'),
       },
       {
@@ -106,8 +97,8 @@ class Ranking extends React.Component {
 
     return (
       <div className={classes.root}>
-        <Title>Classement pour {comp.name}</Title>
-        <SimpleTable columns={columns} data={stats} className={classes.table} />
+        <Title>Classement des equipes pour {comp.name}</Title>
+        <SimpleTable columns={columns} data={teams} className={classes.table} />
       </div>
     );
   }
