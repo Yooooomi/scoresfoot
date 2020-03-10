@@ -10,9 +10,9 @@ class InlineTeam extends React.Component {
     const { classes, team, right } = this.props;
     return (
       <div className={classes.root}>
-        <Grid container alignItems={'center'} spacing={24} direction={right ? 'row-reverse' : 'row'}>
+        <Grid container alignItems={'center'} spacing={2} direction={right ? 'row-reverse' : 'row'}>
           <Grid item xs={3}>
-            <img src={'/default_team.png'} alt={'team'} className={classes.logo} />
+            <img src={`/logos/${team.name}.png`} alt={'team'} className={classes.logo} />
           </Grid>
           <Grid item xs={'auto'}>
             <Link to={urls.team.replace(':id', team.id)}><span className={classes.name}>{team.name}</span></Link>

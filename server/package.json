@@ -4,26 +4,26 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/server.js",
+    "start": "sleep 2 && knex --cwd src/db migrate:latest && nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
-    "cookie-session": "^1.3.3",
-    "express": "^4.16.4",
+    "cookie-session": "^1.4.0",
+    "express": "^4.17.1",
     "joi": "^14.3.1",
-    "knex": "^0.16.3",
-    "mongoose": "^5.4.19",
+    "knex": "^0.20.11",
+    "mongoose": "^5.9.4",
     "morgan": "^1.9.1",
     "numbermap": "^1.1.1",
-    "objection": "^1.6.7",
-    "passport": "^0.4.0",
+    "objection": "^2.1.3",
+    "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "pg": "^7.9.0",
-    "sequelize": "^5.2.12"
+    "pg": "^7.18.2",
+    "sequelize": "^5.21.5"
   }
 }

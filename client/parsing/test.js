@@ -18,17 +18,17 @@ async function main() {
     const datas = cald.parentNode.childNodes.filter(e => e.tagName && e.childNodes.length === 3);
     days.push(datas.map(e => {
       const hasScore = Boolean(e.childNodes[2].childNodes[0].childNodes.length);
-      let localScore = -1, guestScore = -1;
+      let local_score = -1, guest_score = -1;
       if (hasScore) {
         const scores = e.childNodes[2].childNodes[0].childNodes[0].rawText.split('-');
-        localScore = +scores[0];
-        guestScore = +scores[1];
+        local_score = +scores[0];
+        guest_score = +scores[1];
       }
       return ({
         local: e.childNodes[0].childNodes[0].childNodes[0].rawText,
         guest: e.childNodes[1].childNodes[0].childNodes[0].rawText,
-        localScore,
-        guestScore,
+        local_score,
+        guest_score,
       });
     })
     );
@@ -60,8 +60,8 @@ async function main() {
       await axios.post('http://localhost:8081/match/new_by_names', {
         local: match.local,
         guest: match.guest,
-        localScore: isNaN(match.localScore) ? -1 : match.localScore,
-        guestScore: isNaN(match.guestScore) ? -1 : match.guestScore,
+        local_score: isNaN(match.local_score) ? -1 : match.local_score,
+        guest_score: isNaN(match.guest_score) ? -1 : match.guest_score,
         date: date.toISOString(),
         stepName: step.name,
       });

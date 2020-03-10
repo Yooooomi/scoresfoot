@@ -5,5 +5,8 @@ export default theme => ({
   },
   logo: {
     width: '100%',
-  }
+  },
+  teamName: {
+    fontSize: '1.4em',
+  },
 });
