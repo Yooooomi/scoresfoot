@@ -26,16 +26,10 @@ const getStep = (id) => {
 };
 
 const getLastCompetition = async () => {
-  const compets = await Competition.query()./*orderBy('date').*/orderBy('id', 'desc').limit(1).eager('steps(order)', {
-    order: builder => builder.orderBy('id'),
-  });
+  const compets = await Competition.query()./*orderBy('date').*/orderBy('id', 'desc').limit(1);
   if (compets.length) return compets[0];
   return null;
-};
-
-const getCompetitionSimple = id => {
-  return Competition.query().findById(id);
-};
+}
 
 module.exports = {
   newCompetition,
@@ -44,5 +38,4 @@ module.exports = {
   newStep,
   getStep,
   getLastCompetition,
-  getCompetitionSimple,
 };

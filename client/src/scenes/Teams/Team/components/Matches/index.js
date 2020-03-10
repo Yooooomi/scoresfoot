@@ -8,21 +8,18 @@ import { describe, months } from '../../../../../services/date';
 
 class Matches extends React.Component {
   render() {
-    const { className, classes, match, winningTeam, customWinFunction, customLocal, customGuest } = this.props;
+    const { className, classes, match, winningTeam } = this.props;
 
     const date = describe(new Date(match.date));
 
     let state = 'draw';
 
-    if (customWinFunction) state = customWinFunction(match);
-    else {
-      if (match.local_score > match.guest_score) {
-        if (match.local.id === winningTeam) state = 'win';
-        if (match.guest.id === winningTeam) state = 'loss';
-      } else if (match.local_score < match.guest_score) {
-        if (match.local.id === winningTeam) state = 'loss';
-        if (match.guest.id === winningTeam) state = 'win';
-      }
+    if (match.localScore > match.guestScore) {
+      if (match.local.id === winningTeam) state = 'win';
+      if (match.guest.id === winningTeam) state = 'loss';
+    } else if (match.localScore < match.guestScore) {
+      if (match.local.id === winningTeam) state = 'loss';
+      if (match.guest.id === winningTeam) state = 'win';
     }
 
     return (
@@ -30,9 +27,9 @@ class Matches extends React.Component {
         <Paper className={cl(classes.paper, classes[state])} >
           <Grid container justify={'center'} alignItems={'center'}>
             <Grid item xs={3}>
-              <InlineTeam team={customLocal ? customLocal : match.local} />
+              <InlineTeam team={match.local} />
             </Grid>
-            <Grid item xs={2} className={classes.middleContainer}>
+            <Grid item xs={2}>
               <span className={classes.middle}>
                 <span className={classes.score}>
                   {match.local_score} - {match.guest_score}
@@ -42,7 +39,7 @@ class Matches extends React.Component {
               </span>
             </Grid>
             <Grid item xs={3}>
-              <InlineTeam right team={customGuest ? customGuest : match.guest} />
+              <InlineTeam right team={match.guest} />
             </Grid>
           </Grid>
         </Paper>

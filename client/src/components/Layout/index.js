@@ -15,13 +15,11 @@ class Layout extends React.Component {
           </Paper>
         </header>
         <div className={classes.container}>
-          <Paper square className={classes.sider}>
+          <div className={classes.sider}>
             <Sider />
-          </Paper>
+          </div>
           <div className={classes.content}>
-            <Paper style={{width: '100%', padding: '25px'}}>
-              {this.props.children}
-            </Paper>
+            {this.props.children}
           </div>
         </div>
       </div>

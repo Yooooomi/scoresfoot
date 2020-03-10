@@ -63,9 +63,3 @@ export const ezSort = path => (a, b) => {
   if (a[path] < b[path]) return -1;
   return 0;
 };
-
-export const orderStats = (path, asc = 1) => (a, b) => {
-  if (a[path] > b[path]) return 1 * asc;
-  if (a[path] < b[path]) return -1 * asc;
-  return 0;
-};

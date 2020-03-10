@@ -47,11 +47,9 @@ class Popup extends React.Component {
       <Dialog
         open={this.state.open}
         onClose={this.handleCancel}
-        className={classes.popup}
-        maxWidth={'lg'}
       >
-        <DialogTitle className={classes.title}>{this.state.title}</DialogTitle>
-        <DialogContent className={classes.content}>
+        <DialogTitle id="form-dialog-title">{this.state.title}</DialogTitle>
+        <DialogContent>
           {this.state.content}
         </DialogContent>
         <DialogActions>

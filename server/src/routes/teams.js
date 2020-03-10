@@ -4,7 +4,6 @@ const Joi = require('joi');
 const dbTeam = require('../db/team');
 const dbRanking = require('../db/ranking');
 const dbCompet = require('../db/competition');
-const dbMatch = require('../db/match');
 
 module.exports = function () {
 
@@ -52,11 +51,11 @@ module.exports = function () {
     team2: Joi.number().required(),
   });
 
-  routes.get('/teams/confrontations', validate(confrontationSchema, 'query'), async (req, res) => {
+  routes.get('/teams/confrontation', validate(confrontationSchema, 'query'), async (req, res) => {
     const { team1, team2 } = req.value;
 
     try {
-      const confrontations = await dbMatch.getConfrontations(team1, team2);
+      const confrontations = await dbTeam.getConfrontations(team1, team2);
       return res.status(200).send(confrontations);
     } catch (e) {
       console.error(e);
@@ -65,15 +64,13 @@ module.exports = function () {
   });
 
   routes.get('/teams/ranking', async (req, res) => {
-    let compId = req.query.compId;
-    let comp = null;
+    let lastCompId = req.query.compId;
 
     try {
-      if (!compId)
-        comp = (await dbCompet.getLastCompetition());
-      else comp = await dbCompet.getCompetitionSimple(compId);
-      const teams = await dbRanking.getTeamsRanking(comp.id);
-      return res.status(200).send({ teams, competition: comp });
+      if (!lastCompId)
+        lastCompId = (await dbCompet.getLastCompetition()).id;
+      const teams = await dbRanking.getTeamsRanking(lastCompId);
+      return res.status(200).send(teams);
     } catch (e) {
       console.error(e);
       return res.status(500).end();
