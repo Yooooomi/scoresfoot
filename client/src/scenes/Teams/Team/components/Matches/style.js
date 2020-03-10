@@ -1,9 +1,11 @@
 export default theme => ({
   root: {
-    
   },
   paper: {
     padding: '12px',
+  },
+  middleContainer: {
+    textAlign: 'center',
   },
   middle: {
     lineHeight: '40px',
@@ -15,9 +17,9 @@ export default theme => ({
 
   },
   win: {
-    background: theme.palette.success.main,
+    color: theme.palette.success.main,
   },
   loss: {
-    background: theme.palette.error.main,
+    color: theme.palette.error.main,
   }
 });

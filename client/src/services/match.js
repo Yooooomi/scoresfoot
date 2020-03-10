@@ -1,24 +1,24 @@
 export function getPointsId(team, match) {
   if (team === match.local.id) {
-    if (match.localScore > match.guestScore) return 3;
-    if (match.localScore === match.guestScore) return 1;
-    if (match.localScore < match.guestScore) return 0;
+    if (match.local_score > match.guest_score) return 3;
+    if (match.local_score === match.guest_score) return 1;
+    if (match.local_score < match.guest_score) return 0;
   } else {
-    if (match.localScore > match.guestScore) return 0;
-    if (match.localScore === match.guestScore) return 1;
-    if (match.localScore < match.guestScore) return 3;
+    if (match.local_score > match.guest_score) return 0;
+    if (match.local_score === match.guest_score) return 1;
+    if (match.local_score < match.guest_score) return 3;
   }
 }
 
 export function getPoints(team, match) {
   if (team === match.local) {
-    if (match.localScore > match.guestScore) return 3;
-    if (match.localScore === match.guestScore) return 1;
-    if (match.localScore < match.guestScore) return 0;
+    if (match.local_score > match.guest_score) return 3;
+    if (match.local_score === match.guest_score) return 1;
+    if (match.local_score < match.guest_score) return 0;
   } else {
-    if (match.localScore > match.guestScore) return 0;
-    if (match.localScore === match.guestScore) return 1;
-    if (match.localScore < match.guestScore) return 3;
+    if (match.local_score > match.guest_score) return 0;
+    if (match.local_score === match.guest_score) return 1;
+    if (match.local_score < match.guest_score) return 3;
   }
 }
 
@@ -39,11 +39,11 @@ export function getSeasonStats(team, matchs, matchPopulated = false) {
     else if (points === 1) acc.draws++;
     else acc.losses++;
     if (matchPopulated) {
-      acc.goals += (team.id === curr.local.id ? curr.localScore : curr.guestScore);
-      acc.t_goals += (team.id === curr.local.id ? curr.guestScore : curr.localScore);
+      acc.goals += (team.id === curr.local.id ? curr.local_score : curr.guest_score);
+      acc.t_goals += (team.id === curr.local.id ? curr.guest_score : curr.local_score);
     } else {
-      acc.goals += (team.id === curr.local ? curr.localScore : curr.guestScore);
-      acc.t_goals += (team.id === curr.local ? curr.guestScore : curr.localScore);
+      acc.goals += (team.id === curr.local ? curr.local_score : curr.guest_score);
+      acc.t_goals += (team.id === curr.local ? curr.guest_score : curr.local_score);
     }
     acc.played++;
     return acc;
@@ -61,5 +61,11 @@ export function getSeasonStats(team, matchs, matchPopulated = false) {
 export const ezSort = path => (a, b) => {
   if (a[path] > b[path]) return 1;
   if (a[path] < b[path]) return -1;
+  return 0;
+};
+
+export const orderStats = (path, asc = 1) => (a, b) => {
+  if (a[path] > b[path]) return 1 * asc;
+  if (a[path] < b[path]) return -1 * asc;
   return 0;
 };

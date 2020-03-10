@@ -155,17 +155,17 @@ module.exports = function () {
     stepName: Joi.string().required(),
     local: Joi.string().required(),
     guest: Joi.string().required(),
-    localScore: Joi.number().required(),
-    guestScore: Joi.number().required(),
+    local_score: Joi.number().required(),
+    guest_score: Joi.number().required(),
     date: Joi.any().required(),
   });
 
   routes.post('/match/new_by_names', validate(newMatchNameSchema), isLogged, isAdmin, async (req, res) => {
-    const { local, guest, date, stepName, localScore, guestScore } = req.body;
+    const { local, guest, date, stepName, local_score, guest_score } = req.body;
 
     try {
       console.log('here');
-      await dbMatch.addMatchNames(date, stepName, local, guest, localScore, guestScore);
+      await dbMatch.addMatchNames(date, stepName, local, guest, local_score, guest_score);
       console.log('here');
       return res.status(200).end();
     } catch (e) {
@@ -186,15 +186,15 @@ module.exports = function () {
 
   const setScoreSchema = Joi.object().keys({
     matchId: Joi.number().required(),
-    localScore: Joi.number().required().min(0),
-    guestScore: Joi.number().required().min(0),
+    local_score: Joi.number().required().min(0),
+    guest_score: Joi.number().required().min(0),
   });
 
   routes.post('/match/setscore', validate(setScoreSchema), isLogged, isAdmin, async (req, res) => {
-    const { matchId, localScore, guestScore } = req.body;
+    const { matchId, local_score, guest_score } = req.body;
 
     try {
-      await dbMatch.setMatchScore(matchId, localScore, guestScore);
+      await dbMatch.setMatchScore(matchId, local_score, guest_score);
       return res.status(200).end();
     } catch (e) {
       console.error(e);

@@ -8,24 +8,21 @@ import { connect } from 'react-redux';
 import { mapStateToProps, mapDispatchToProps } from '../../../services/redux/tools';
 import urls from '../../../services/urls';
 import { Link } from 'react-router-dom';
-
-const orderStats = (path, asc = 1) => (a, b) => {
-  if (a[path] > b[path]) return 1 * asc;
-  if (a[path] < b[path]) return -1 * asc;
-  return 0;
-};
+import { orderStats } from '../../../services/match';
+import { Paper } from '@material-ui/core';
 
 class UserRanking extends React.Component {
 
   state = {
     users: [],
+    comp: null,
   };
 
   async componentDidMount() {
     try {
       const users = await api.get('/users/ranking');
 
-      this.setState({ users: users.data });
+      this.setState({ users: users.data.users, comp: users.data.competition });
     } catch (e) {
       // TODO invent something
     }
@@ -33,9 +30,20 @@ class UserRanking extends React.Component {
 
   render() {
     const { classes, user } = this.props;
-    const { users } = this.state;
+    const { users, comp } = this.state;
+
+    if (!comp) return null;
+
+    users.sort(orderStats('points'));
+    users.forEach((e, k) => e.rank = k);
 
     const columns = [
+      {
+        key: 'rank',
+        name: '#',
+        render: (el, k) => <span>{el.rank + 1}</span>,
+        sort: orderStats('rank'),
+      },
       {
         name: 'name',
         key: 'username',
@@ -89,8 +97,10 @@ class UserRanking extends React.Component {
 
     return (
       <div className={classes.root}>
-        <Title>Classement pour {'TODO'}</Title>
-        <SimpleTable columns={columns} data={users} className={classes.table} />
+        <Title>Classement des joueurs pour {comp.name}</Title>
+        <Paper>
+          <SimpleTable columns={columns} data={users} className={classes.table} />
+        </Paper>
       </div>
     );
   }

@@ -5,12 +5,15 @@ import Team from '../../components/Team';
 import { connect } from 'react-redux';
 import { mapStateToProps, mapDispatchToProps } from '../../services/redux/tools';
 import Title from '../../components/Title';
-import { Grid, Menu, MenuItem, Button } from '@material-ui/core';
+import { Grid, Menu, MenuItem, Button, Paper } from '@material-ui/core';
 
 import nmap from 'numbermap';
 import api from '../../services/api';
 import { timeDiffString } from '../../services/date';
 import Numbers from '../../components/Numbers';
+
+import History from '@material-ui/icons/HistoryOutlined';
+import Confrontations from '../../components/Confrontations';
 
 nmap();
 
@@ -21,6 +24,7 @@ class Prono extends React.Component {
     guestBet: 0,
     coeff: 0,
     countdown: '',
+    confrontations: null,
   };
 
   pronoAvailable = () => Boolean(this.props.user.todos.length);
@@ -61,45 +65,65 @@ class Prono extends React.Component {
         guest: guestBet,
         coeff: coeff,
       });
-      window.message('success', 'Pronostique enregistré');
-      this.props.madeProno(match, localBet, guestBet, coeff);
-      console.log(this.props.user);
+      this.setState({
+        localBet: 0,
+        guestBet: 0,
+        coeff: 0,
+        confrontations: null,
+      }, () => {
+        window.message('success', 'Pronostique enregistré');
+        this.props.madeProno(match, localBet, guestBet, coeff);
+      });
     } catch (e) {
       window.message('error', 'Erreur lors de l\'enregistrement');
+    }
+  }
+
+  seeConfrontations = async e => {
+    const { confrontations } = this.state;
+    const { local, guest } = this.props.user.todos[0];
+
+    if (!confrontations) {
+      console.log(local, guest);
+      try {
+        const matches = await api.get('/teams/confrontations', {
+          team1: local.id,
+          team2: guest.id,
+        });
+        console.log(matches.data);
+        this.setState({
+          confrontations: matches.data,
+        }, () => {
+          window.popup('Confrontations', <Confrontations matches={this.state.confrontations} teamId={null} teams={[local, guest]} />);
+        });
+      } catch (e) {
+        return;
+      }
+    } else {
+      window.popup('Confrontations', <Confrontations matches={this.state.confrontations} teamId={null} teams={[local, guest]} />);
     }
   }
 
   render() {
     const { classes } = this.props;
 
-    console.log('USER', this.props.user);
-
     if (!this.pronoAvailable()) {
       clearInterval(this.int);
       return <NoProno />;
     }
-    const { local, guest, cote } = this.props.user.todos[0];
-
-    let localCote = 1 / (cote / (1 - cote));
-    let guestCote = 1 / ((1 - cote) / (1 - (1 - cote)));
-
-    if (cote === 1) {
-      guestCote = 20;
-    } else if (cote === 0) {
-      localCote = 20;
-    }
+    const { local, guest } = this.props.user.todos[0];
 
     return (
       <div className={classes.root}>
         <Title>Pronostiquer un match</Title>
         <div className={classes.countdown}>Match dans {this.state.countdown}</div>
-        <Grid container justify={'center'} alignItems={'center'}>
-          <Grid item xs={5} className={classes.teamContainer}>
+        <Grid container justify={'space-between'} alignItems={'center'}>
+          <Grid item xs={4} className={classes.teamContainer}>
             <Team team={local} className={classes.team} />
             <Numbers className={classes.selector} name={'localBet'} value={this.state.localBet} onValueChange={this.update} />
           </Grid>
-          <Grid item xs={2}>{localCote}:{guestCote}</Grid>
-          <Grid item xs={5} className={classes.teamContainer}>
+          <Grid item xs={2}>contre<br /><Button onClick={this.seeConfrontations}><History /></Button></Grid>
+          <Grid item xs={4} className={classes.teamContainer}>
             <Team team={guest} className={classes.team} />
             <Numbers className={classes.selector} name={'guestBet'} value={this.state.guestBet} onValueChange={this.update} />
           </Grid>

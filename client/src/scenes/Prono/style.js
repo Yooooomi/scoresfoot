@@ -1,6 +1,7 @@
 export default theme => ({
   root: {
     margin: '0 auto',
+    width: '100%',
   },
   team: {
     width: '30%',
@@ -20,5 +21,6 @@ export default theme => ({
   },
   countdown: {
     margin: '25px 0',
-  }
+    fontSize: '1.4em',
+  },
 });

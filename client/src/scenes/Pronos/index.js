@@ -26,8 +26,8 @@ class Pronos extends React.Component {
               else className = 'loss';
             return (
               <Paper key={e.match_id} className={cl(classes.paper, classes[className])}>
-                <Grid container alignItems={'center'}>
-                  <Grid item xs={4}>
+                <Grid container alignItems={'center'} justify={'space-between'}>
+                  <Grid item xs={3}>
                     <InlineTeam team={e.match.local} />
                   </Grid>
                   <Grid item xs={2}>
@@ -36,7 +36,7 @@ class Pronos extends React.Component {
                       e.match.local_score !== -1 && <div><br />{e.match.local_score} - {e.match.guest_score}</div>
                     }
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={3}>
                     <InlineTeam right team={e.match.guest} />
                   </Grid>
                   <Grid item xs={2}>Coeff: {e.coeff}<br />
