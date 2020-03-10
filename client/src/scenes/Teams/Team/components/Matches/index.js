@@ -27,14 +27,14 @@ class Matches extends React.Component {
 
     return (
       <div className={cl(classes.root, className)}>
-        <Paper className={cl(classes.paper, classes[state])} >
+        <Paper className={classes.paper} >
           <Grid container justify={'center'} alignItems={'center'}>
             <Grid item xs={3}>
               <InlineTeam team={customLocal ? customLocal : match.local} />
             </Grid>
             <Grid item xs={2} className={classes.middleContainer}>
               <span className={classes.middle}>
-                <span className={classes.score}>
+                <span className={cl(classes.score, classes[state])}>
                   {match.local_score} - {match.guest_score}
                 </span>
                 <br />

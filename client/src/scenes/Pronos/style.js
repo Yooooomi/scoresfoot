@@ -1,6 +1,6 @@
 export default theme => ({
   root: {
-    
+    width: '100%',
   },
   paper: {
     padding: '25px',

@@ -7,6 +7,7 @@ import SimpleTable from '../../../components/SimpleTable';
 import Title from '../../../components/Title';
 import urls from '../../../services/urls';
 import { Link } from 'react-router-dom';
+import { Paper } from '@material-ui/core';
 
 class Ranking extends React.Component {
 
@@ -18,7 +19,7 @@ class Ranking extends React.Component {
   async componentDidMount() {
     try {
       const teams = await api.get('/teams/ranking');
-      console.log(teams.data);
+      console.log('Ranking', teams.data);
       this.setState({ teams: teams.data.teams, comp: teams.data.competition });
     } catch (e) {
       // nothing
@@ -40,6 +41,9 @@ class Ranking extends React.Component {
         name: '#',
         render: (el, k) => <span>{el.rank + 1}</span>,
         sort: orderStats('rank'),
+      },
+      {
+        render: (el, k, props) => <img style={{ width: '45px' }} src={`/logos/${el.name}.png`} alt="team" />,
       },
       {
         key: 'name',
@@ -98,7 +102,9 @@ class Ranking extends React.Component {
     return (
       <div className={classes.root}>
         <Title>Classement des equipes pour {comp.name}</Title>
-        <SimpleTable columns={columns} data={teams} className={classes.table} />
+        <Paper className={classes.paper}>
+          <SimpleTable columns={columns} data={teams} className={classes.table} />
+        </Paper>
       </div>
     );
   }

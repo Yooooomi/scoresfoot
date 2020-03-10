@@ -9,14 +9,14 @@ const addMatch = (stepId, local, guest, date) => {
   });
 };
 
-const addMatchNames = (date, stepName, local, guest, localScore, guestScore) => {
+const addMatchNames = (date, stepName, local, guest, local_score, guest_score) => {
   return Match.query().insert({
     date,
     step_id: Step.query().findOne('name', stepName).select('id').limit(1),
     local_team_id: Team.query().findOne('name', local).select('id').limit(1),
     guest_team_id: Team.query().findOne('name', guest).select('id').limit(1),
-    local_score: localScore,
-    guest_score: guestScore,
+    local_score: local_score,
+    guest_score: guest_score,
   });
 };
 
@@ -50,8 +50,12 @@ const getMatchesEndedWithoutScore = () => {
 };
 
 const getConfrontations = (id1, id2) => {
-  console.log(Match.query().where('local_team_id', id1).andWhere('guest_team_id', id2).orWhere('local_team_id', id2).andWhere('guest_team_id', id1).orderBy('date').toSql())
-  return Match.query().where('local_team_id', id1).andWhere('guest_team_id', id2).orWhere('local_team_id', id2).andWhere('guest_team_id', id1).orderBy('date');
+  return Match.query()
+    .where('local_team_id', id1)
+    .andWhere('guest_team_id', id2)
+    .orWhere('local_team_id', id2)
+    .andWhere('guest_team_id', id1)
+    .orderBy('date');
 };
 
 module.exports = {

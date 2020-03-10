@@ -10,8 +10,8 @@ class Team extends React.Component {
     const { classes, team, className } = this.props;
     return (
       <div className={cl(classes.root, className)}>
-        <img src={'/default_team.png'} alt={'team'} className={classes.logo} />
-        <Link to={urls.team.replace(':id', team.id)}><span>{team.name}</span></Link>
+        <img src={`/logos/${team.name}.png`} alt={'team'} className={classes.logo} />
+        <Link to={urls.team.replace(':id', team.id)}><span className={classes.teamName}>{team.name}</span></Link>
       </div>
     );
   }

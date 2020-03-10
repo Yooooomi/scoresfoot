@@ -5,11 +5,17 @@ const initialUser = {};
 const userReducer = (state = initialUser, action) => {
   switch (action.type) {
   case 'UPDATE_USER':
+    if (!action.user.todos) {
+      action.user.todos = [];
+    }
+    if (!action.user.pronos) {
+      action.user.pronos = [];
+    }
     return { ...state, user: action.user };
   case 'MADE_PRONO':
     state.user.todos.shift();
     state.user.pronos.push({
-      local: action.infos.local, guest: action.infos.guest, match: action.infos.match, coeff: action.infos.coeff,
+      local_score: action.infos.local, guest_score: action.infos.guest, match: action.infos.match, coeff: action.infos.coeff,
     });
     return {
       ...state, user: {

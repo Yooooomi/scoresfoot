@@ -21,5 +21,6 @@ export default theme => ({
   },
   countdown: {
     margin: '25px 0',
-  }
+    fontSize: '1.4em',
+  },
 });

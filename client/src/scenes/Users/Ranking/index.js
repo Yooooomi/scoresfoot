@@ -9,6 +9,7 @@ import { mapStateToProps, mapDispatchToProps } from '../../../services/redux/too
 import urls from '../../../services/urls';
 import { Link } from 'react-router-dom';
 import { orderStats } from '../../../services/match';
+import { Paper } from '@material-ui/core';
 
 class UserRanking extends React.Component {
 
@@ -97,7 +98,9 @@ class UserRanking extends React.Component {
     return (
       <div className={classes.root}>
         <Title>Classement des joueurs pour {comp.name}</Title>
-        <SimpleTable columns={columns} data={users} className={classes.table} />
+        <Paper>
+          <SimpleTable columns={columns} data={users} className={classes.table} />
+        </Paper>
       </div>
     );
   }

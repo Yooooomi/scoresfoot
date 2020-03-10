@@ -1,25 +1,27 @@
 version: '3'
 
 services:
-  mongo:
-    image:  mongo
+  db:
+    image: postgres
     restart: always
+    ports:
+      - "5432:5432"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: scoresfoot
 
   server:
     build: .
     volumes:
-      - ./:/app:Z
+      - ./src:/app/src
     environment:
-      - MONGODB_ENDPOINT=mongo:27017
-      - MONGODB_USERNAME=root
-      - MONGODB_PASSWORD=password
-      - WAIT_HOSTS=mongo:27017
+      - DB_USER=root
+      - DB_PASS=password
+      - DB_ENDPOINT=db:5432
     links:
-      - mongo
+      - db
     ports:
       - "8081:8081"
     depends_on:
-      - mongo
+      - db
