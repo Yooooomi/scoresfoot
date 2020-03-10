@@ -11,7 +11,7 @@ const getStep = (id);
 const getLastCompetition;
 
 const addMatch = (stepId, local, guest, date);
-const addMatchNames = (date, stepName, local, guest, local_score, guest_score);
+const addMatchNames = (date, stepName, local, guest, localScore, guestScore);
 const getMatches = (offset, number);
 const getMatch = (id);
 const setMatchScore = (id, local, guest);

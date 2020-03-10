@@ -80,22 +80,14 @@ class Team extends Model {
 
   static get relationMappings() {
     return {
-      locals: {
+      matches: {
         relation: Model.HasManyRelation,
         modelClass: Match,
         join: {
-          from: ['teams.id'],
-          to: ['matches.local_team_id'],
+          from: 'matches.local_team_id',
+          to: 'teams.id',
         }
-      },
-      guests: {
-        relation: Model.HasManyRelation,
-        modelClass: Match,
-        join: {
-          from: ['teams.id'],
-          to: ['matches.guest_team_id'],
-        }
-      },
+      }
     };
   }
 }

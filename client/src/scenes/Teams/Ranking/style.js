@@ -5,7 +5,5 @@ export default theme => ({
   },
   table: {
     width: '100%',
-  },
-  paper: {
-  },
+  }
 });

@@ -26,13 +26,9 @@ import ViewUser from './scenes/Users/ViewUser';
 class App extends Component {
   async componentDidMount() {
     try {
-      const { data: user } = await api.get('/me');
-      const { data: pronos } = await api.get('/pronos?nb=10&offset=0');
-      const { data: todos } = await api.get('/prono/todo?nb=10&offset=0');
-      console.log('TODOS', todos);
-      user.pronos = pronos;
-      user.todos = todos;
-      this.props.updateUser(user);
+      const user = await api.get('/me');
+      console.log('DATA', user.data);
+      this.props.updateUser(user.data);
     } catch (e) {
       // Nothing happens, user just not logged
     }

@@ -1,12 +1,6 @@
 // Update with your config settings.
 
-const config = {
-  user: process.env.DB_USER,
-  pwd: process.env.DB_PASS,
-  endpoint: process.env.DB_ENDPOINT,
-}
-
 module.exports = {
   client: 'pg',
-  connection: `postgresql://${config.user}:${config.pwd}@${config.endpoint}/scoresfoot`,
+  connection: 'postgresql://timothee:licorne@127.0.0.1:5432/scoresfoot',
 };

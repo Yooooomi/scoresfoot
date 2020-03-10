@@ -1,15 +1,17 @@
 export default theme => ({
   root: {
-    padding: '25px 0px',
+    padding: '18px 0',
     position: 'relative',
     background: theme.palette.primary.main,
     width: '100%',
-    textAlign: 'left',
-    color: 'white',
   },
   link: {
     width: '100%',
     color: 'white',
+  },
+  search: {
+    width: 'calc(100% - 30px)',
+    margin: 'auto',
   },
   linkContainer: {
     display: 'flex',
@@ -23,7 +25,7 @@ export default theme => ({
     },
     textAlign: 'left',
     alignItems: 'center',
-    padding: '10px 10px',
+    padding: '10px 0',
   },
   linkContainerHighlighted: {
     background: theme.palette.primary.light,
@@ -32,6 +34,14 @@ export default theme => ({
     }
   },
   icon: {
-    color: 'white',
+    display: 'flex',
+    flex: 2,
+    width: '20%',
+    justifyContent: 'center',
   },
+  text: {
+    display: 'flex',
+    flex: 10,
+    width: '80%',
+  }
 });

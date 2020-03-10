@@ -51,8 +51,8 @@ class UpdateMatch extends React.Component {
     try {
       await api.post('/match/setscore', {
         matchId: matches[ndx].id,
-        local_score: local[ndx],
-        guest_score: guest[ndx],
+        localScore: local[ndx],
+        guestScore: guest[ndx],
       });
       window.message('success', 'Score mis à jour !');
       local.splice(ndx, 1);

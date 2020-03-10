@@ -19,13 +19,10 @@ function validate(schema, target = 'body') {
   return function(req, res, next) {
     const { value, error } = Joi.validate(req[target], schema);
 
-    req[target] = value;
+    req.body = value;
     req.value = value;
 
-    if (error) {
-      console.error(error);
-      return res.status(400).end();
-    }
+    if (error) return res.status(400).end();
     return next();
   }
 }

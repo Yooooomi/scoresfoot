@@ -4,41 +4,6 @@ const Joi = require('joi');
 const dbProno = require('../db/prono');
 
 module.exports = function () {
-  const todoSchema = Joi.object().keys({
-    nb: Joi.number().min(1).max(20).required(),
-    offset: Joi.number().min(0).required(),
-  });
-
-  routes.get('/prono/todo', validate(todoSchema, 'query'), isLogged, async (req, res) => {
-    const { user } = req;
-    const { nb, offset } = req.query;
-    
-    try {
-      const todos = await dbProno.getTodos(user.id, nb, offset);
-      return res.status(200).send(todos);
-    } catch (e) {
-      console.error(e);
-      return res.status(500).end();
-    }
-  });
-
-  const getPronosSchema = Joi.object().keys({
-    nb: Joi.number().min(1).max(20).required(),
-    offset: Joi.number().min(0).required(),
-  });
-
-  routes.get('/pronos', validate(getPronosSchema, 'query'), isLogged, async (req, res) => {
-    const { user } = req;
-    const { nb, offset } = req.query;
-
-    try {
-      const pronos = await dbProno.getPronos(user.id, nb, offset);
-      return res.status(200).send(pronos);
-    } catch (e) {
-      console.error(e);
-      return res.status(500).end();
-    }
-  });
 
   const pronoSchema = Joi.object().keys({
     matchId: Joi.number().required(),

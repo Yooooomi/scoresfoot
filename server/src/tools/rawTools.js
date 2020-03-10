@@ -10,10 +10,10 @@ function pointsEarned(prono) {
   //   localCote = 20;
   // }
 
-  if (prono.local === prono.match.local_score && prono.guest === prono.match.guest_score) {
+  if (prono.local === prono.match.localScore && prono.guest === prono.match.guestScore) {
     return 3;
   }
-  if (Math.sign(prono.local - prono.guest) === Math.sign(prono.match.local_score - prono.match.guest_score)) {
+  if (Math.sign(prono.local - prono.guest) === Math.sign(prono.match.localScore - prono.match.guestScore)) {
     return 1;
   }
   return 0;

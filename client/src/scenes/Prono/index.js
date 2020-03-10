@@ -5,7 +5,7 @@ import Team from '../../components/Team';
 import { connect } from 'react-redux';
 import { mapStateToProps, mapDispatchToProps } from '../../services/redux/tools';
 import Title from '../../components/Title';
-import { Grid, Menu, MenuItem, Button, Paper } from '@material-ui/core';
+import { Grid, Menu, MenuItem, Button } from '@material-ui/core';
 
 import nmap from 'numbermap';
 import api from '../../services/api';
@@ -65,15 +65,9 @@ class Prono extends React.Component {
         guest: guestBet,
         coeff: coeff,
       });
-      this.setState({
-        localBet: 0,
-        guestBet: 0,
-        coeff: 0,
-        confrontations: null,
-      }, () => {
-        window.message('success', 'Pronostique enregistré');
-        this.props.madeProno(match, localBet, guestBet, coeff);
-      });
+      window.message('success', 'Pronostique enregistré');
+      this.props.madeProno(match, localBet, guestBet, coeff);
+      console.log(this.props.user);
     } catch (e) {
       window.message('error', 'Erreur lors de l\'enregistrement');
     }
@@ -117,13 +111,13 @@ class Prono extends React.Component {
       <div className={classes.root}>
         <Title>Pronostiquer un match</Title>
         <div className={classes.countdown}>Match dans {this.state.countdown}</div>
-        <Grid container justify={'space-between'} alignItems={'center'}>
-          <Grid item xs={4} className={classes.teamContainer}>
+        <Grid container justify={'center'} alignItems={'center'}>
+          <Grid item xs={5} className={classes.teamContainer}>
             <Team team={local} className={classes.team} />
             <Numbers className={classes.selector} name={'localBet'} value={this.state.localBet} onValueChange={this.update} />
           </Grid>
           <Grid item xs={2}>contre<br /><Button onClick={this.seeConfrontations}><History /></Button></Grid>
-          <Grid item xs={4} className={classes.teamContainer}>
+          <Grid item xs={5} className={classes.teamContainer}>
             <Team team={guest} className={classes.team} />
             <Numbers className={classes.selector} name={'guestBet'} value={this.state.guestBet} onValueChange={this.update} />
           </Grid>

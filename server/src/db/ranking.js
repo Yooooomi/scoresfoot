@@ -15,7 +15,7 @@ const getUserInfos = async (id, stepId) => {
 };
 
 const getUserStats = async (id, compId = -1) => {
-  const stats = await User.knex().raw(`
+  const stats = await User.raw(`
     SELECT
       u.id, u.username,
       SUM (
@@ -62,7 +62,7 @@ const getUserStats = async (id, compId = -1) => {
 }
 
 const getUserRanking = async (compId) => {
-  const users = await User.knex().raw(`
+  const users = await User.raw(`
     SELECT
       u.id, u.username,
       SUM (
@@ -108,7 +108,7 @@ const getUserRanking = async (compId) => {
 };
 
 const getTeamsRanking = async (compId) => {
-  const ranks = await Team.knex().raw(`
+  const ranks = await Team.raw(`
     SELECT
         t.id, t.name,
       SUM (
@@ -159,65 +159,8 @@ const getTeamsRanking = async (compId) => {
     JOIN steps s ON s.competition_id = c.id
     JOIN matches m ON m.step_id = s.id AND (m.local_team_id = t.id OR m.guest_team_id = t.id) AND m.local_score != -1
     GROUP BY t.id
-  `);
+  `)
   return ranks.rows;
-};
-
-const getTeamStats = async (compId, teamId) => {
-  const stats = await Team.knex().raw(`
-    SELECT
-        t.id, t.name,
-      SUM (
-        CASE
-          WHEN (t.id = m.local_team_id OR t.id = m.guest_team_id) AND m.local_score = m.guest_score THEN 1
-          WHEN t.id = m.local_team_id AND m.local_score > m.guest_score THEN 3
-          WHEN t.id = m.local_team_id AND m.local_score < m.guest_score THEN 0
-          WHEN t.id = m.guest_team_id AND m.local_score < m.guest_score THEN 3
-          WHEN t.id = m.guest_team_id AND m.local_score > m.guest_score THEN 0
-          ELSE 0
-        END
-      ) AS points,
-      SUM (
-        CASE
-          WHEN t.id = m.local_team_id AND m.local_score > m.guest_score THEN 1
-          WHEN t.id = m.guest_team_id AND m.local_score < m.guest_score THEN 1
-          ELSE 0
-        END
-      ) AS wins,
-      SUM (
-        CASE
-          WHEN (t.id = m.local_team_id OR t.id = m.guest_team_id) AND m.local_score = m.guest_score THEN 1
-          ELSE 0
-        END
-      ) AS draws,
-      SUM (
-        CASE
-          WHEN t.id = m.local_team_id AND m.local_score < m.guest_score THEN 1
-          WHEN t.id = m.guest_team_id AND m.local_score > m.guest_score THEN 1
-          ELSE 0
-        END
-      ) AS losses,
-      SUM (1) AS played,
-      SUM (
-        CASE
-          WHEN t.id = m.local_team_id THEN m.local_score
-          ELSE m.guest_score
-        END
-      ) AS goals,
-      SUM (
-        CASE
-          WHEN t.id = m.local_team_id THEN m.guest_score
-          ELSE m.local_score
-        END
-      ) AS t_goals
-    FROM teams t
-    JOIN competitions c ON c.id = ${compId}
-    JOIN steps s ON s.competition_id = c.id
-    JOIN matches m ON m.step_id = s.id AND (m.local_team_id = t.id OR m.guest_team_id = t.id) AND m.local_score != -1
-    WHERE t.id = ${teamId}
-    GROUP BY t.id
-  `);
-  return stats.rows[0];
 };
 
 module.exports = {
@@ -225,5 +168,4 @@ module.exports = {
   getUserRanking,
   getTeamsRanking,
   getUserStats,
-  getTeamStats,
 };

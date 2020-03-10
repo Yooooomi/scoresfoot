@@ -9,18 +9,20 @@ class Layout extends React.Component {
     const { classes } = this.props;
     return (
       <div className={classes.root}>
-        <div className={classes.sider}>
-          <div className={classes.scoresfoot}>
-            Scoresfoot
-          </div>
-          <Sider />
-        </div>
         <header>
           <Paper className={classes.header}>
+            <span className={classes.scoresfoot}>Scoresfoot</span>
           </Paper>
         </header>
         <div className={classes.container}>
-          {this.props.children}
+          <Paper square className={classes.sider}>
+            <Sider />
+          </Paper>
+          <div className={classes.content}>
+            <Paper style={{width: '100%', padding: '25px'}}>
+              {this.props.children}
+            </Paper>
+          </div>
         </div>
       </div>
     );

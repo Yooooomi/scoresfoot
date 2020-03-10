@@ -8,7 +8,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import PropTypes from 'prop-types';
 
-import { withWidth, Paper } from '@material-ui/core';
+import { withWidth } from '@material-ui/core';
 import { isWidthDown } from '@material-ui/core/withWidth';
 
 const orderStats = (path, asc = 1) => (a, b) => {

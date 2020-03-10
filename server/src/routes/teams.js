@@ -37,19 +37,9 @@ module.exports = function () {
 
   routes.get('/teams/team/:id', async (req, res) => {
     const { id } = req.params;
-    let { compId } = req.query;
 
     try {
       const team = await dbTeam.getTeam(id);
-      
-      if (compId) {
-        if (compId === 'last') {
-          compId = (await dbCompet.getLastCompetition()).id;
-        }
-        const stats = await dbRanking.getTeamStats(compId, team.id);
-        team.stats = stats;
-      }
-
       return res.status(200).send(team);
     } catch (e) {
       console.error(e);
@@ -83,7 +73,6 @@ module.exports = function () {
         comp = (await dbCompet.getLastCompetition());
       else comp = await dbCompet.getCompetitionSimple(compId);
       const teams = await dbRanking.getTeamsRanking(comp.id);
-      console.log(comp.id, teams);
       return res.status(200).send({ teams, competition: comp });
     } catch (e) {
       console.error(e);
